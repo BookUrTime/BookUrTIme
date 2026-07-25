@@ -34,6 +34,12 @@ export default function BookingsPage() {
     router.push("/service");
   };
 
+  const providerTypeLabels = {
+    hospital: { en: "Hospital", hi: "अस्पताल" },
+    aadhaar: { en: "Aadhaar", hi: "आधार" },
+    bank: { en: "Bank", hi: "बैंक" },
+  };
+
   const serviceIcons = {
     hospital: "local_hospital",
     aadhaar: "fingerprint",
@@ -108,8 +114,8 @@ export default function BookingsPage() {
                         <h3 className="font-headline-md text-[18px] text-on-surface font-semibold group-hover:text-primary transition-colors leading-tight">
                           {booking.providerName}
                         </h3>
-                        <p className="font-label-sm text-label-sm text-on-surface-variant capitalize mt-1">
-                          {booking.providerType}
+                        <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">
+                          {providerTypeLabels[booking.providerType]?.[activeLang] || providerTypeLabels[booking.providerType]?.en || booking.providerType}
                         </p>
                       </div>
                     </div>

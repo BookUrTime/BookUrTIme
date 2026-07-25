@@ -7,6 +7,10 @@ export const strings = {
     home: "Home",
     min: "min",
     mins: "mins",
+    navHome: "Home",
+    navBookings: "My Bookings",
+    navSupport: "Support",
+    navAccount: "Account",
 
     // app/page.jsx (Welcome/Intro)
     confirmed: "Confirmed",
@@ -102,6 +106,10 @@ export const strings = {
     home: "मुख्य पृष्ठ",
     min: "मिनट",
     mins: "मिनट",
+    navHome: "होम",
+    navBookings: "मेरी बुकिंग",
+    navSupport: "सहायता",
+    navAccount: "खाता",
 
     // app/page.jsx (Welcome/Intro)
     confirmed: "कन्फर्म हुआ",

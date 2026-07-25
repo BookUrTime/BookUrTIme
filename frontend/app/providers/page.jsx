@@ -47,9 +47,9 @@ export default function ProvidersPage() {
   };
 
   const serviceTypeLabels = {
-    hospital: "Hospitals",
-    aadhaar: "Aadhaar centers",
-    bank: "Banks",
+    hospital: { en: "Hospitals", hi: "अस्पताल" },
+    aadhaar: { en: "Aadhaar centers", hi: "आधार केंद्र" },
+    bank: { en: "Banks", hi: "बैंक" },
   };
 
   const serviceIcons = {
@@ -128,7 +128,7 @@ export default function ProvidersPage() {
         {/* Headings */}
         <div className="mb-stack-lg">
           <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm">
-            {serviceTypeLabels[serviceType] || "Services"} {s.nearYou}
+            {serviceTypeLabels[serviceType]?.[activeLang] || serviceTypeLabels[serviceType]?.en || "Services"} {s.nearYou}
           </h2>
           <p className="font-body-md text-on-surface-variant">
             {s.showingFacilities}

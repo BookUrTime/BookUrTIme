@@ -92,10 +92,10 @@ export default function ServicePage() {
                 {/* Text details */}
                 <div className="flex-grow">
                   <h3 className="font-headline-md text-headline-md text-on-surface mb-1 font-semibold">
-                    {cat.label}
+                    {cat.label[activeLang] || cat.label.en}
                   </h3>
                   <p className="text-on-surface-variant font-body-md text-body-md leading-snug">
-                    {cat.desc}
+                    {cat.desc[activeLang] || cat.desc.en}
                   </p>
                 </div>
                 {/* Arrow */}

@@ -172,12 +172,20 @@ export default function ConfirmationPage() {
     );
   }
 
+  const providerTypeLabels = {
+    hospital: { en: "Hospital", hi: "अस्पताल" },
+    aadhaar: { en: "Aadhaar", hi: "आधार" },
+    bank: { en: "Bank", hi: "बैंक" },
+  };
+
   const serviceIcons = {
     hospital: "local_hospital",
     aadhaar: "badge",
     bank: "account_balance",
   };
   const providerIcon = serviceIcons[provider.type] || "local_hospital";
+  const typeKey = provider.type || serviceType;
+  const displayType = providerTypeLabels[typeKey]?.[activeLang] || providerTypeLabels[typeKey]?.en || typeKey;
 
   return (
     <>
@@ -238,7 +246,7 @@ export default function ConfirmationPage() {
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase">{s.providerServiceLabel}</p>
                 <p className="font-headline-md text-headline-md text-on-surface">{provider.name}</p>
-                <p className="font-body-md text-on-surface-variant capitalize">{provider.type || serviceType}</p>
+                <p className="font-body-md text-on-surface-variant">{displayType}</p>
               </div>
             </div>
 
