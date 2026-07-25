@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e18]
+  - main [ref=e58]:
+    - generic [ref=e59]:
+      - paragraph [ref=e60]: STEP 3 OF 3
+      - heading "Pick a time" [level=1] [ref=e61]
+      - generic [ref=e62]:
+        - paragraph [ref=e63]: CityCare Clinic
+        - paragraph [ref=e64]: Grey slots are already booked.
+      - generic [ref=e65]:
+        - heading "Morning" [level=2] [ref=e66]
+        - generic [ref=e67]:
+          - button "09:00" [ref=e68]
+          - button "09:30" [disabled] [ref=e69]
+          - button "10:00" [ref=e70]
+          - button "10:30" [ref=e71]
+      - generic [ref=e72]:
+        - heading "Afternoon" [level=2] [ref=e73]
+        - generic [ref=e74]:
+          - button "14:00" [ref=e75]
+          - button "14:30" [disabled] [ref=e76]
+          - button "15:00" [ref=e77]
+      - button "Confirm Booking" [disabled] [ref=e78]

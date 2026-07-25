@@ -1,0 +1,17 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e18]
+  - main [ref=e43]:
+    - generic [ref=e44]:
+      - paragraph [ref=e45]: STEP 2 OF 3
+      - heading "Choose a provider" [level=1] [ref=e46]
+      - paragraph [ref=e47]: Live wait estimates near you.
+      - generic [ref=e49]:
+        - heading "CityCare Clinic" [level=2] [ref=e50]
+        - generic [ref=e51]:
+          - generic [ref=e52]: 📍 1.8 km away
+          - generic [ref=e53]: ~12 min wait
+        - generic [ref=e54]:
+          - paragraph [ref=e55]:
+            - text: "Next:"
+            - strong [ref=e56]: 09:00
+          - button "Book" [ref=e57]

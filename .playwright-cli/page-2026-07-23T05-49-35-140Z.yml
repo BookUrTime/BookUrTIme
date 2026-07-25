@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e18]
+  - main [ref=e19]:
+    - generic [ref=e20]:
+      - paragraph [ref=e21]: STEP 1 OF 3
+      - heading "What do you need?" [level=1] [ref=e22]
+      - paragraph [ref=e23]: Choose a service to find nearby slots.
+      - generic [ref=e24]:
+        - button "🏥 Hospital Doctor visits and clinic appointments" [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]: 🏥
+            - generic [ref=e28]:
+              - generic [ref=e29]: Hospital
+              - generic [ref=e30]: Doctor visits and clinic appointments
+        - button "🪪 Aadhaar Updates, enrolment and biometrics" [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: 🪪
+            - generic [ref=e34]:
+              - generic [ref=e35]: Aadhaar
+              - generic [ref=e36]: Updates, enrolment and biometrics
+        - button "🏦 Bank Account and branch services" [ref=e37]:
+          - generic [ref=e38]:
+            - generic [ref=e39]: 🏦
+            - generic [ref=e40]:
+              - generic [ref=e41]: Bank
+              - generic [ref=e42]: Account and branch services

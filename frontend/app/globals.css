@@ -1,26 +1,199 @@
+@config "../tailwind.config.js";
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-primary: #004ac6;
+  --color-primary-container: #2563eb;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #eeefff;
+  --color-on-primary-fixed: #00174b;
+  --color-on-primary-fixed-variant: #003ea8;
+  --color-primary-fixed: #dbe1ff;
+  --color-primary-fixed-dim: #b4c5ff;
+  --color-inverse-primary: #b4c5ff;
+
+  --color-secondary: #006e2d;
+  --color-secondary-container: #7cf994;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #007230;
+  --color-on-secondary-fixed: #002109;
+  --color-on-secondary-fixed-variant: #005320;
+  --color-secondary-fixed: #7ffc97;
+  --color-secondary-fixed-dim: #62df7d;
+
+  --color-tertiary: #824500;
+  --color-tertiary-container: #a65900;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffede1;
+  --color-on-tertiary-fixed: #2f1500;
+  --color-on-tertiary-fixed-variant: #6e3900;
+  --color-tertiary-fixed: #ffdcc3;
+  --color-tertiary-fixed-dim: #ffb77d;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+
+  --color-surface: #f7f9fb;
+  --color-on-surface: #191c1e;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-variant: #e0e3e5;
+  --color-on-surface-variant: #434655;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-surface-tint: #0053db;
+
+  --color-surface-container: #eceef0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+
+  --color-outline: #737686;
+  --color-outline-variant: #c3c6d7;
+
+  /* Spacings */
+  --spacing-stack-md: 1rem;
+  --spacing-page-margin: 1.5rem;
+  --spacing-container-max: 448px;
+  --spacing-stack-lg: 1.5rem;
+  --spacing-gutter: 1rem;
+  --spacing-stack-sm: 0.5rem;
+
+  /* Border Radii */
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+
+  /* Font Families */
+  --font-headline-lg: "Inter", sans-serif;
+  --font-body-lg: "Inter", sans-serif;
+  --font-label-lg: "Inter", sans-serif;
+  --font-display-sm: "Inter", sans-serif;
+  --font-label-sm: "Inter", sans-serif;
+  --font-body-md: "Inter", sans-serif;
+  --font-headline-md: "Inter", sans-serif;
+
+  /* Backward compatibility shortcuts */
+  --color-success: #007230;
+  --color-warning: #ffdcc3;
+  --color-danger: #ba1a1a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background-color: #f7f9fb;
+  color: #191c1e;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: max(884px, 100dvh);
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+}
+
+/* Animations */
+.success-check-scale {
+  animation: success-scale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes success-scale {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes shine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.animate-shine {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 200% 100%;
+  animation: shine 3s infinite;
+}
+
+.whatsapp-bubble-tail {
+  position: absolute;
+  bottom: -8px;
+  right: 0px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 12px solid #D1FAE5;
+}
+
+.confetti-canvas {
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Custom scrollbar for clean UI */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+/* Active Highlight cards */
+.language-card-active {
+  border-width: 2px !important;
+  border-color: #004ac6 !important;
+  transform: scale(0.98);
+  transition: all 150ms ease-in-out;
+}
+
+.service-card-active {
+  border-color: #004ac6 !important;
+  background-color: #eeefff !important;
+}
+
+/* Slot Selection Pills */
+.slot-pill.active {
+  background-color: #004ac6 !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.slot-pill.disabled {
+  background-color: #e0e3e5 !important;
+  color: #434655 !important;
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.min-touch-target {
+  min-height: 48px;
+  min-width: 48px;
 }

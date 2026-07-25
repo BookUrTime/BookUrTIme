@@ -1,0 +1,15 @@
+- main [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: Simple appointments
+    - heading "BookUrTime" [level=1] [ref=e6]
+    - paragraph [ref=e7]: Book nearby services without standing in line.
+    - generic [ref=e8]:
+      - paragraph [ref=e9]: Choose your language
+      - button "English →" [active] [ref=e10]:
+        - generic [ref=e11]:
+          - generic [ref=e12]: English
+          - generic [ref=e13]: →
+      - button "हिन्दी (Hindi) →" [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e16]: हिन्दी (Hindi)
+          - generic [ref=e17]: →
