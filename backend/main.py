@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routers import providers, bookings, users, dashboard, reminders
 from seed import seed_data
 
-app = FastAPI(title="ApnaSlot API")
+app = FastAPI(title="BookUrTime API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,4 +25,4 @@ async def on_startup():
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to ApnaSlot API"}
+    return {"message": "Welcome to BookUrTime API"}
