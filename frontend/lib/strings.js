@@ -1,0 +1,192 @@
+export const strings = {
+  en: {
+    // Common / Global
+    brandName: "BookUrTime",
+    processing: "Processing...",
+    back: "Back",
+    home: "Home",
+    min: "min",
+    mins: "mins",
+
+    // app/page.jsx (Welcome/Intro)
+    confirmed: "Confirmed",
+    sampleAppointment: "10:30 AM Appointment",
+    welcomeTitle1: "Book your slot.",
+    welcomeTitle2: "Skip the queue.",
+    welcomeDesc: "Professional scheduling for busy people. Efficient, reliable, and always on time.",
+    featureFast: "Fast",
+    featureReliable: "Reliable",
+    featureSecure: "Secure",
+    getStarted: "Get Started",
+    alreadyHaveAppointment: "Already have an appointment? Log in",
+
+    // app/language/page.jsx
+    welcomeLabel: "WELCOME",
+    chooseLanguage: "Choose your language",
+    languageDesc: "Select your preferred language to continue with BookUrTime.",
+    changeLaterDesc: "You can change this later in your profile settings.",
+
+    // app/service/page.jsx
+    whatNeedToBook: "What do you need to book?",
+    selectCategoryDesc: "Select a category to see available service providers in your area.",
+    continueBtn: "Continue",
+
+    // app/providers/page.jsx
+    nearYou: "near you",
+    showingFacilities: "Showing facilities within 10 km of your current location.",
+    nearest: "Nearest",
+    shortestWait: "Shortest wait",
+    waitLabel: "wait",
+    next: "Next:",
+    book: "Book",
+    noProvidersFound: "No providers found for this service type.",
+    goBackChooseService: "Go back and choose another service",
+    newDelhi: "New Delhi, Delhi",
+    kmAway: "km away",
+    noSlotsLeft: "No slots left",
+
+    // app/slots/page.jsx
+    chooseProviderFirst: "Please choose a provider first.",
+    chooseProviderBtn: "Choose a provider",
+    estWaitPrefix: "Est. wait:",
+    takingWalkinsBookings: "Taking walk-ins & bookings",
+    availableSlots: "Available Slots",
+    morning: "Morning",
+    afternoon: "Afternoon",
+    bookingDetails: "Booking Details",
+    fullName: "Full Name",
+    phoneNumber: "Phone Number",
+    enterYourName: "Enter your name",
+    includeCountryCode: "Include country code for verification",
+    confirmBooking: "Confirm Booking",
+
+    // app/confirmation/page.jsx
+    noActiveBooking: "No Active Booking",
+    noActiveBookingDesc: "We couldn't find any active booking details. Please return to the homepage to select a provider and slot.",
+    returnToHome: "Return to Home",
+    bookingConfirmed: "Booking Confirmed",
+    bookingConfirmedDesc: "Your appointment has been successfully scheduled.",
+    queueToken: "Queue Token",
+    estWaitLabel: "Est. Wait:",
+    providerServiceLabel: "Provider & Service",
+    dateLabel: "Date",
+    timeLabel: "Time",
+    patientNameLabel: "Patient Name",
+    whatsappPrefix: "Your appointment at",
+    whatsappMiddle: "is confirmed for",
+    whatsappSuffix: ". Your token is",
+    whatsappEnd: ". See you there!",
+    justNow: "Just now",
+    bookAnother: "Book Another Appointment",
+
+    // app/bookings/page.jsx
+    bookNew: "Book New",
+    myBookings: "My Bookings",
+    bookingsDesc: "Manage your active queue tokens, appointment slots, and check-in status.",
+    tokenLabel: "Token",
+    timeSlotLabel: "Time slot",
+    cancelThisQuestion: "Cancel this?",
+    noBtn: "No",
+    yesCancelBtn: "Yes, Cancel",
+    cancelBtn: "Cancel",
+    viewTicket: "View Ticket",
+    noActiveBookingsTitle: "No active bookings",
+    noActiveBookingsDesc: "You haven't scheduled any queue appointments yet. Choose a service provider to book your slot.",
+    startBookingNow: "Start Booking Now"
+  },
+  hi: {
+    // Common / Global
+    brandName: "BookUrTime",
+    processing: "प्रगति पर है...",
+    back: "पीछे",
+    home: "मुख्य पृष्ठ",
+    min: "मिनट",
+    mins: "मिनट",
+
+    // app/page.jsx (Welcome/Intro)
+    confirmed: "कन्फर्म हुआ",
+    sampleAppointment: "10:30 AM अपॉइंटमेंट",
+    welcomeTitle1: "अपना स्लॉट बुक करें।",
+    welcomeTitle2: "कतार से बचें।",
+    welcomeDesc: "व्यस्त लोगों के लिए पेशेवर शेड्यूलिंग। कुशल, विश्वसनीय और हमेशा समय पर।",
+    featureFast: "तेज़",
+    featureReliable: "विश्वसनीय",
+    featureSecure: "सुरक्षित",
+    getStarted: "शुरू करें",
+    alreadyHaveAppointment: "पहले से ही अपॉइंटमेंट है? लॉग इन करें",
+
+    // app/language/page.jsx
+    welcomeLabel: "स्वागत है",
+    chooseLanguage: "अपनी भाषा चुनें",
+    languageDesc: "BookUrTime जारी रखने के लिए अपनी पसंदीदा भाषा चुनें।",
+    changeLaterDesc: "आप इसे बाद में अपनी प्रोफ़ाइल सेटिंग्स में बदल सकते हैं।",
+
+    // app/service/page.jsx
+    whatNeedToBook: "आपको क्या बुक करने की आवश्यकता है?",
+    selectCategoryDesc: "अपने क्षेत्र में उपलब्ध सेवा प्रदाताओं को देखने के लिए एक श्रेणी चुनें।",
+    continueBtn: "जारी रखें",
+
+    // app/providers/page.jsx
+    nearYou: "आपके पास",
+    showingFacilities: "आपके वर्तमान स्थान के 10 किमी के भीतर की सुविधाएं दिखाई जा रही हैं।",
+    nearest: "निकटतम",
+    shortestWait: "सबसे कम प्रतीक्षा",
+    waitLabel: "प्रतीक्षा",
+    next: "अगला:",
+    book: "बुक करें",
+    noProvidersFound: "इस सेवा प्रकार के लिए कोई प्रदाता नहीं मिला।",
+    goBackChooseService: "पीछे जाएं और दूसरी सेवा चुनें",
+    newDelhi: "नई दिल्ली, दिल्ली",
+    kmAway: "किमी दूर",
+    noSlotsLeft: "कोई स्लॉट नहीं बचा",
+
+    // app/slots/page.jsx
+    chooseProviderFirst: "कृपया पहले एक प्रदाता चुनें।",
+    chooseProviderBtn: "एक प्रदाता चुनें",
+    estWaitPrefix: "अनुमानित प्रतीक्षा:",
+    takingWalkinsBookings: "वॉक-इन और बुकिंग स्वीकार्य हैं",
+    availableSlots: "उपलब्ध स्लॉट",
+    morning: "सुबह",
+    afternoon: "दोपहर",
+    bookingDetails: "बुकिंग विवरण",
+    fullName: "पूरा नाम",
+    phoneNumber: "फ़ोन नंबर",
+    enterYourName: "अपना नाम दर्ज करें",
+    includeCountryCode: "सत्यापन के लिए देश का कोड शामिल करें",
+    confirmBooking: "बुकिंग की पुष्टि करें",
+
+    // app/confirmation/page.jsx
+    noActiveBooking: "कोई सक्रिय बुकिंग नहीं",
+    noActiveBookingDesc: "हमें कोई सक्रिय बुकिंग विवरण नहीं मिला। प्रदाता और स्लॉट चुनने के लिए कृपया मुख्य पृष्ठ पर लौटें।",
+    returnToHome: "मुख्य पृष्ठ पर लौटें",
+    bookingConfirmed: "बुकिंग की पुष्टि हो गई",
+    bookingConfirmedDesc: "आपका अपॉइंटमेंट सफलतापूर्वक शेड्यूल कर दिया गया है।",
+    queueToken: "कतार टोकन",
+    estWaitLabel: "अनुमानित प्रतीक्षा:",
+    providerServiceLabel: "प्रदाता और सेवा",
+    dateLabel: "दिनांक",
+    timeLabel: "समय",
+    patientNameLabel: "मरीज का नाम",
+    whatsappPrefix: "आपका अपॉइंटमेंट",
+    whatsappMiddle: "के लिए",
+    whatsappSuffix: "को कन्फर्म हो गया है। आपका टोकन",
+    whatsappEnd: "है। वहां मिलते हैं!",
+    justNow: "अभी-अभी",
+    bookAnother: "दूसरा अपॉइंटमेंट बुक करें",
+
+    // app/bookings/page.jsx
+    bookNew: "नया बुक करें",
+    myBookings: "मेरी बुकिंग",
+    bookingsDesc: "अपने सक्रिय कतार टोकन, अपॉइंटमेंट स्लॉट और चेक-इन स्थिति का प्रबंधन करें।",
+    tokenLabel: "टोकन",
+    timeSlotLabel: "समय स्लॉट",
+    cancelThisQuestion: "इसे रद्द करें?",
+    noBtn: "नहीं",
+    yesCancelBtn: "हां, रद्द करें",
+    cancelBtn: "रद्द करें",
+    viewTicket: "टिकट देखें",
+    noActiveBookingsTitle: "कोई सक्रिय बुकिंग नहीं",
+    noActiveBookingsDesc: "आपने अभी तक कोई अपॉइंटमेंट शेड्यूल नहीं किया है। अपना स्लॉट बुक करने के लिए एक सेवा प्रदाता चुनें।",
+    startBookingNow: "अभी बुकिंग शुरू करें"
+  }
+};

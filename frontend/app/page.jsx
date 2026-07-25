@@ -1,36 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Screen } from "../components/UI";
+import { useBooking } from "../context/BookingContext";
+import { strings } from "../lib/strings";
 
 export default function Home() {
   const router = useRouter();
+  const { isHydrated, bookings, language } = useBooking();
+  const activeLang = language || "en";
+  const s = strings[activeLang];
   const [isNavigating, setIsNavigating] = useState(false);
 
-  // Check localStorage synchronously via lazy initializer to avoid
-  // an effect that calls setState (react-hooks/set-state-in-effect).
-  const [hasCheckedBookings] = useState(() => {
-    if (typeof window === "undefined") return false;
-    const storedBookings = localStorage.getItem("bookurtime_bookings");
-    if (storedBookings) {
-      try {
-        const parsed = JSON.parse(storedBookings);
-        if (parsed && parsed.length > 0) {
-          return false; // has bookings — will redirect
-        }
-      } catch (e) {
-        console.error(e);
-      }
+  // Redirect if existing bookings were found after hydration completes
+  useEffect(() => {
+    if (isHydrated && bookings && bookings.length > 0) {
+      router.replace("/bookings");
     }
-    return true; // no bookings found
-  });
-
-  // Redirect if existing bookings were found (non-blocking side-effect)
-  if (!hasCheckedBookings && typeof window !== "undefined") {
-    router.replace("/bookings");
-  }
+  }, [isHydrated, bookings, router]);
 
   const handleGetStarted = () => {
     setIsNavigating(true);
@@ -39,7 +28,7 @@ export default function Home() {
     }, 400); // Small delay for visual feedback
   };
 
-  if (!hasCheckedBookings) {
+  if (!isHydrated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <span className="material-symbols-outlined text-primary text-4xl animate-spin">
@@ -58,7 +47,7 @@ export default function Home() {
       {/* Top Header Bar */}
       <header className="flex items-center justify-between px-page-margin w-full h-16 bg-surface z-20 shrink-0">
         <div className="font-headline-md text-headline-md font-bold text-primary">
-          BookUrTime
+          {s.brandName}
         </div>
         <button
           onClick={() => router.push("/language")}
@@ -96,8 +85,8 @@ export default function Home() {
                   </span>
                 </div>
                 <div className="text-left">
-                  <p className="font-label-sm text-label-sm text-on-surface-variant">Confirmed</p>
-                  <p className="font-label-lg text-label-lg text-on-surface font-semibold">10:30 AM Appointment</p>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant">{s.confirmed}</p>
+                  <p className="font-label-lg text-label-lg text-on-surface font-semibold">{s.sampleAppointment}</p>
                 </div>
               </div>
             </div>
@@ -107,11 +96,11 @@ export default function Home() {
         {/* Text Details */}
         <div className="space-y-stack-sm max-w-[320px]">
           <h1 className="font-display-sm text-display-sm text-on-surface tracking-tight leading-tight">
-            Book your slot.<br />
-            <span className="text-primary font-bold">Skip the queue.</span>
+            {s.welcomeTitle1}<br />
+            <span className="text-primary font-bold">{s.welcomeTitle2}</span>
           </h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Professional scheduling for busy people. Efficient, reliable, and always on time.
+            {s.welcomeDesc}
           </p>
         </div>
       </section>
@@ -123,15 +112,15 @@ export default function Home() {
           <div className="grid grid-cols-3 gap-2 py-4 border-t border-outline-variant">
             <div className="flex flex-col items-center gap-1">
               <span className="material-symbols-outlined text-primary text-2xl">bolt</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">Fast</span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureFast}</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="material-symbols-outlined text-primary text-2xl">verified</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">Reliable</span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureReliable}</span>
             </div>
             <div className="flex flex-col items-center gap-1">
               <span className="material-symbols-outlined text-primary text-2xl">security</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">Secure</span>
+              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureSecure}</span>
             </div>
           </div>
 
@@ -147,7 +136,7 @@ export default function Home() {
                 <span className="material-symbols-outlined animate-spin">progress_activity</span>
               ) : (
                 <>
-                  <span>Get Started</span>
+                  <span>{s.getStarted}</span>
                   <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
                     arrow_forward
                   </span>
@@ -158,7 +147,7 @@ export default function Home() {
               onClick={() => router.push("/bookings")}
               className="w-full py-3 text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors cursor-pointer"
             >
-              Already have an appointment? Log in
+              {s.alreadyHaveAppointment}
             </button>
           </div>
         </div>

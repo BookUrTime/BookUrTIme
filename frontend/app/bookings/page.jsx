@@ -3,14 +3,27 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../../context/BookingContext";
-import { Screen, Card, BottomNavBar } from "../../components/UI";
+import { Screen, BottomNavBar } from "../../components/UI";
 import { providers } from "../../lib/dummyData";
 import { formatDate } from "../../lib/formatDate";
+import { strings } from "../../lib/strings";
 
 export default function BookingsPage() {
   const router = useRouter();
-  const { bookings, cancelAppointment, viewBookingDetails } = useBooking();
+  const { isHydrated, bookings, cancelAppointment, viewBookingDetails, language } = useBooking();
+  const activeLang = language || "en";
+  const s = strings[activeLang];
   const [confirmCancelId, setConfirmCancelId] = useState("");
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
 
   const handleViewTicket = (id) => {
     viewBookingDetails(id);
@@ -49,13 +62,13 @@ export default function BookingsPage() {
     <Screen className="flex flex-col min-h-screen bg-background relative overflow-x-hidden p-0 max-w-container-max mx-auto">
       {/* Top App Bar Header */}
       <header className="bg-surface sticky top-0 w-full max-w-container-max mx-auto h-16 z-50 flex items-center justify-between px-page-margin border-b border-outline-variant/10 shrink-0">
-        <h1 className="font-headline-md text-headline-md font-bold text-primary">BookUrTime</h1>
+        <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         <button
           onClick={handleStartBooking}
           className="text-primary hover:opacity-85 active:scale-95 transition-all min-touch-target flex items-center justify-center p-2 cursor-pointer font-semibold text-sm gap-1"
         >
           <span className="material-symbols-outlined text-lg font-bold">add_circle</span>
-          Book New
+          {s.bookNew}
         </button>
       </header>
 
@@ -64,10 +77,10 @@ export default function BookingsPage() {
         {/* Headings */}
         <div className="mb-stack-lg">
           <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm">
-            My Bookings
+            {s.myBookings}
           </h2>
           <p className="font-body-md text-on-surface-variant">
-            Manage your active queue tokens, appointment slots, and check-in status.
+            {s.bookingsDesc}
           </p>
         </div>
 
@@ -76,6 +89,9 @@ export default function BookingsPage() {
           {bookings && bookings.length > 0 ? (
             bookings.map((booking) => {
               const icon = serviceIcons[booking.providerType] || "local_hospital";
+              const prov = providers.find((p) => p.id === booking.providerId);
+              const waitMinutes = prov ? prov.waitMinutes : null;
+              const waitBadgeClass = getWaitBadgeClass(booking.providerType, booking.providerId);
               return (
                 <div
                   key={booking.id}
@@ -97,24 +113,31 @@ export default function BookingsPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-[10px] uppercase font-bold tracking-widest text-primary block leading-none mb-1">
-                        Token
-                      </span>
-                      <span className="font-extrabold text-slate-900 text-lg leading-none">
-                        {booking.token}
-                      </span>
+                    <div className="flex flex-col items-end gap-1.5 shrink-0">
+                      <div className="text-right">
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-primary block leading-none mb-1">
+                          {s.tokenLabel}
+                        </span>
+                        <span className="font-extrabold text-slate-900 text-lg leading-none">
+                          {booking.token}
+                        </span>
+                      </div>
+                      {waitMinutes !== null && (
+                        <span className={`px-2.5 py-0.5 rounded-full font-label-sm text-label-sm ${waitBadgeClass}`}>
+                          {waitMinutes} {s.min}
+                        </span>
+                      )}
                     </div>
                   </div>
 
                   {/* Middle Row: Appointment Details */}
                   <div className="grid grid-cols-2 gap-4 py-3 border-y border-slate-50 text-sm mt-2 select-none">
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-medium block">Date</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-medium block">{s.dateLabel}</span>
                       <strong className="text-slate-800 font-semibold">{formatBookingDate(booking.date)}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-500 uppercase font-medium block">Time slot</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-medium block">{s.timeSlotLabel}</span>
                       <strong className="text-slate-800 font-semibold">{booking.slot}</strong>
                     </div>
                   </div>
@@ -123,7 +146,7 @@ export default function BookingsPage() {
                   <div className="flex gap-3 justify-end mt-4">
                     {confirmCancelId === booking.id ? (
                       <div className="flex gap-2 items-center">
-                        <span className="text-xs text-red-600 font-medium mr-1 select-none">Cancel this?</span>
+                        <span className="text-xs text-red-600 font-medium mr-1 select-none">{s.cancelThisQuestion}</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -131,7 +154,7 @@ export default function BookingsPage() {
                           }}
                           className="px-3 py-1.5 text-xs font-semibold text-slate-600 border border-slate-200 hover:bg-slate-50 rounded-lg transition cursor-pointer"
                         >
-                          No
+                          {s.noBtn}
                         </button>
                         <button
                           onClick={(e) => {
@@ -141,7 +164,7 @@ export default function BookingsPage() {
                           }}
                           className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition cursor-pointer"
                         >
-                          Yes, Cancel
+                          {s.yesCancelBtn}
                         </button>
                       </div>
                     ) : (
@@ -153,7 +176,7 @@ export default function BookingsPage() {
                           }}
                           className="px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl transition duration-150 cursor-pointer"
                         >
-                          Cancel
+                          {s.cancelBtn}
                         </button>
                         <button
                           onClick={(e) => {
@@ -163,7 +186,7 @@ export default function BookingsPage() {
                           className="px-4 py-2 text-sm font-semibold bg-primary text-white rounded-xl shadow-sm hover:opacity-95 active:scale-[0.98] transition duration-150 cursor-pointer flex items-center gap-1.5"
                         >
                           <span className="material-symbols-outlined text-sm font-bold">confirmation_number</span>
-                          View Ticket
+                          {s.viewTicket}
                         </button>
                       </>
                     )}
@@ -176,9 +199,9 @@ export default function BookingsPage() {
             <div className="bg-white rounded-2xl p-8 border border-outline-variant text-center flex flex-col items-center gap-4">
               <span className="material-symbols-outlined text-slate-300 text-5xl">event_busy</span>
               <div>
-                <h3 className="font-bold text-slate-900 text-lg">No active bookings</h3>
+                <h3 className="font-bold text-slate-900 text-lg">{s.noActiveBookingsTitle}</h3>
                 <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto">
-                 You haven&apos;t scheduled any queue appointments yet. Choose a service provider to book your slot.
+                 {s.noActiveBookingsDesc}
                 </p>
               </div>
               <button
@@ -186,7 +209,7 @@ export default function BookingsPage() {
                 className="mt-2 bg-primary text-white px-6 py-3 rounded-full font-semibold shadow-md hover:opacity-95 active:scale-98 transition duration-150 cursor-pointer flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-lg">add_circle</span>
-                <span>Start Booking Now</span>
+                <span>{s.startBookingNow}</span>
               </button>
             </div>
           )}

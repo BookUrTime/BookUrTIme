@@ -6,11 +6,24 @@ import Image from "next/image";
 import { useBooking } from "../../context/BookingContext";
 import { Screen } from "../../components/UI";
 import { languages } from "../../lib/dummyData";
+import { strings } from "../../lib/strings";
 
 export default function LanguagePage() {
   const router = useRouter();
-  const { language, setLanguage } = useBooking();
+  const { isHydrated, language, setLanguage } = useBooking();
+  const activeLang = language || "en";
+  const s = strings[activeLang];
   const [selected, setSelected] = useState(language || "");
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
 
   const handleLanguageSelect = (langCode) => {
     setSelected(langCode);
@@ -31,10 +44,10 @@ export default function LanguagePage() {
       {/* Header Area */}
       <header className="pt-12 pb-8 px-page-margin shrink-0">
         <div className="flex flex-col gap-2">
-          <span className="font-label-lg text-label-lg text-primary tracking-widest font-bold">WELCOME</span>
-          <h1 className="font-display-sm text-display-sm text-on-surface">Choose your language</h1>
+          <span className="font-label-lg text-label-lg text-primary tracking-widest font-bold">{s.welcomeLabel}</span>
+          <h1 className="font-display-sm text-display-sm text-on-surface">{s.chooseLanguage}</h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Select your preferred language to continue with BookUrTime.
+            {s.languageDesc}
           </p>
         </div>
       </header>
@@ -89,7 +102,7 @@ export default function LanguagePage() {
       {/* Footer Area */}
       <footer className="p-page-margin pb-12 shrink-0">
         <p className="text-center font-label-sm text-label-sm text-on-surface-variant">
-          You can change this later in your profile settings.
+          {s.changeLaterDesc}
         </p>
       </footer>
     </Screen>

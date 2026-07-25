@@ -7,18 +7,21 @@ import { providers } from "../../lib/dummyData";
 import { useBooking } from "../../context/BookingContext";
 import { Screen, BottomNavBar } from "../../components/UI";
 import { formatDate } from "../../lib/formatDate";
+import { strings } from "../../lib/strings";
 
 export default function ProvidersPage() {
   const router = useRouter();
-  const { serviceType, setProvider, getBookedSlots } = useBooking();
+  const { isHydrated, serviceType, setProvider, getBookedSlots, language } = useBooking();
+  const activeLang = language || "en";
+  const s = strings[activeLang];
   const [filter, setFilter] = useState("nearest"); // 'nearest' or 'shortest'
 
-  // Guard: redirect to /service if serviceType is missing
+  // Guard: redirect to /service if serviceType is missing AFTER hydration
   useEffect(() => {
-    if (!serviceType) {
+    if (isHydrated && !serviceType) {
       router.replace("/service");
     }
-  }, [serviceType, router]);
+  }, [isHydrated, serviceType, router]);
 
   // Back navigation
   const handleBack = () => {
@@ -70,8 +73,18 @@ export default function ProvidersPage() {
   const getNextAvailableSlot = (prov) => {
     const booked = getBookedSlots(prov);
     const available = prov.slots.find((s) => !booked.includes(s));
-    return available || "No slots left";
+    return available || s.noSlotsLeft;
   };
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
 
   return (
     <Screen className="flex flex-col min-h-screen bg-background relative overflow-x-hidden p-0 max-w-container-max mx-auto">
@@ -84,7 +97,7 @@ export default function ProvidersPage() {
           >
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">BookUrTime</h1>
+          <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         </div>
         <button className="text-on-surface-variant hover:opacity-80 transition-opacity min-touch-target flex items-center justify-center cursor-pointer">
           <span className="material-symbols-outlined">search</span>
@@ -107,7 +120,7 @@ export default function ProvidersPage() {
           <div className="absolute bottom-4 left-4 text-white">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">location_on</span>
-              <span className="font-label-lg text-label-lg font-semibold">New Delhi, Delhi</span>
+              <span className="font-label-lg text-label-lg font-semibold">{s.newDelhi}</span>
             </div>
           </div>
         </div>
@@ -115,10 +128,10 @@ export default function ProvidersPage() {
         {/* Headings */}
         <div className="mb-stack-lg">
           <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm">
-            {serviceTypeLabels[serviceType] || "Services"} near you
+            {serviceTypeLabels[serviceType] || "Services"} {s.nearYou}
           </h2>
           <p className="font-body-md text-on-surface-variant">
-            Showing facilities within 10 km of your current location.
+            {s.showingFacilities}
           </p>
         </div>
 
@@ -132,7 +145,7 @@ export default function ProvidersPage() {
                 : "text-on-surface-variant hover:text-primary"
             }`}
           >
-            Nearest
+            {s.nearest}
           </button>
           <button
             onClick={() => setFilter("shortest")}
@@ -142,7 +155,7 @@ export default function ProvidersPage() {
                 : "text-on-surface-variant hover:text-primary"
             }`}
           >
-            Shortest wait
+            {s.shortestWait}
           </button>
         </div>
 
@@ -171,12 +184,12 @@ export default function ProvidersPage() {
                       </h3>
                       <p className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-1">
                         <span className="material-symbols-outlined text-[14px]">near_me</span>
-                        {prov.distanceKm} km away
+                        {prov.distanceKm} {s.kmAway}
                       </p>
                     </div>
                   </div>
                   <div className={`px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0 ${waitClass}`}>
-                    {prov.waitMinutes} min wait
+                    {prov.waitMinutes} {s.min} {s.waitLabel}
                   </div>
                 </div>
 
@@ -187,7 +200,7 @@ export default function ProvidersPage() {
                       {formatDate()}
                     </p>
                     <p className="font-body-md text-on-surface text-sm">
-                      Next: <strong className="font-bold text-slate-800">{nextAvailable}</strong>
+                      {s.next} <strong className="font-bold text-slate-800">{nextAvailable}</strong>
                     </p>
                   </div>
                   <button
@@ -197,7 +210,7 @@ export default function ProvidersPage() {
                     }}
                     className="bg-primary text-white px-6 py-2 rounded-full font-label-lg text-label-lg hover:opacity-95 active:scale-95 transition-all shadow-md group-hover:shadow-primary/20 min-touch-target cursor-pointer"
                   >
-                    Book
+                    {s.book}
                   </button>
                 </div>
               </div>
@@ -206,12 +219,12 @@ export default function ProvidersPage() {
 
           {sortedMatches.length === 0 && (
             <div className="bg-white rounded-2xl p-6 border border-outline-variant text-center">
-              <p className="text-on-surface-variant">No providers found for this service type.</p>
+              <p className="text-on-surface-variant">{s.noProvidersFound}</p>
               <button
                 onClick={handleBack}
                 className="mt-4 text-primary font-semibold hover:underline"
               >
-                Go back and choose another service
+                {s.goBackChooseService}
               </button>
             </div>
           )}

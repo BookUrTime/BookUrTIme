@@ -6,11 +6,24 @@ import Image from "next/image";
 import { useBooking } from "../../context/BookingContext";
 import { Screen, BottomNavBar } from "../../components/UI";
 import { serviceTypes } from "../../lib/dummyData";
+import { strings } from "../../lib/strings";
 
 export default function ServicePage() {
   const router = useRouter();
-  const { serviceType, setServiceType } = useBooking();
+  const { isHydrated, serviceType, setServiceType, language } = useBooking();
+  const activeLang = language || "en";
+  const s = strings[activeLang];
   const [selected, setSelected] = useState(serviceType || "");
+
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
 
   const handleCardSelect = (type) => {
     setSelected(type);
@@ -45,7 +58,7 @@ export default function ServicePage() {
         >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
-        <h1 className="font-headline-md text-headline-md font-bold text-primary">BookUrTime</h1>
+        <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         <div className="w-12"></div> {/* Spacer balance */}
       </header>
 
@@ -53,9 +66,9 @@ export default function ServicePage() {
       <main className="flex-grow pt-24 pb-32 px-page-margin">
         {/* Headings */}
         <div className="mb-stack-lg">
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">What do you need to book?</h2>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface">{s.whatNeedToBook}</h2>
           <p className="text-on-surface-variant mt-2 font-body-md text-body-md">
-            Select a category to see available service providers in your area.
+            {s.selectCategoryDesc}
           </p>
         </div>
 
@@ -119,7 +132,7 @@ export default function ServicePage() {
           disabled={!selected}
           className="w-full h-[52px] bg-primary text-white rounded-full font-label-lg text-label-lg shadow-md hover:bg-opacity-95 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
-          <span>Continue</span>
+          <span>{s.continueBtn}</span>
           <span className="material-symbols-outlined">arrow_forward</span>
         </button>
       </footer>

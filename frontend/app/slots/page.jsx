@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../../context/BookingContext";
 import { Screen } from "../../components/UI";
-import { formatDate } from "../../lib/formatDate";
+import { strings } from "../../lib/strings";
 
 export default function SlotsPage() {
   const router = useRouter();
   const {
+    isHydrated,
     provider,
     slot,
     setSlot,
@@ -18,7 +19,11 @@ export default function SlotsPage() {
     setPhone,
     bookAppointment,
     getBookedSlots,
+    language
   } = useBooking();
+
+  const activeLang = language || "en";
+  const s = strings[activeLang];
 
   const [selectedSlot, setSelectedSlot] = useState(slot || "");
   const [userName, setUserName] = useState(name || "");
@@ -28,29 +33,26 @@ export default function SlotsPage() {
   // Derive showForm from selectedSlot instead of using state+effect
   const showForm = !!selectedSlot;
 
-  // Scroll to form when a new slot is chosen (uses ref to track previous slot)
-  const prevSlotRef = useRef(selectedSlot);
-  if (selectedSlot && selectedSlot !== prevSlotRef.current) {
-    prevSlotRef.current = selectedSlot;
-    // Schedule scroll after render
-    setTimeout(() => {
-      const formEl = document.getElementById("booking-form-container");
-      if (formEl) {
-        formEl.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 100);
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
   }
 
   if (!provider) {
     return (
       <Screen>
         <div className="bg-white rounded-2xl p-6 border border-outline-variant text-center">
-          <p className="text-on-surface-variant">Please choose a provider first.</p>
+          <p className="text-on-surface-variant">{s.chooseProviderFirst}</p>
           <button
             onClick={() => router.push("/providers")}
             className="mt-4 text-primary font-semibold hover:underline"
           >
-            Choose a provider
+            {s.chooseProviderBtn}
           </button>
         </div>
       </Screen>
@@ -94,6 +96,13 @@ export default function SlotsPage() {
 
   const handleSlotSelect = (time12) => {
     setSelectedSlot(time12);
+    // Scroll to form after a brief delay to let React render the form
+    setTimeout(() => {
+      const formEl = document.getElementById("booking-form-container");
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
   };
 
   const handleConfirmBooking = () => {
@@ -134,9 +143,9 @@ export default function SlotsPage() {
           className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center gap-1 p-2 min-touch-target cursor-pointer shrink-0"
         >
           <span className="material-symbols-outlined">arrow_back</span>
-          <span className="font-label-lg text-label-lg font-semibold">Back</span>
+          <span className="font-label-lg text-label-lg font-semibold">{s.back}</span>
         </button>
-        <h1 className="font-headline-md text-headline-md font-bold text-primary">BookUrTime</h1>
+        <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         <div className="w-12"></div> {/* Spacer balance */}
       </header>
 
@@ -157,14 +166,14 @@ export default function SlotsPage() {
               </h2>
               <p className="font-label-lg text-label-lg text-on-surface-variant flex items-center gap-1 mt-0.5">
                 <span className="material-symbols-outlined text-sm">schedule</span>
-                Est. wait: {provider.waitMinutes} mins
+                {s.estWaitPrefix} {provider.waitMinutes} {s.mins}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 mt-4 select-none">
             <span className="w-2 h-2 rounded-full bg-secondary-fixed-dim"></span>
             <span className="font-label-sm text-label-sm text-secondary font-semibold">
-              Taking walk-ins &amp; bookings
+              {s.takingWalkinsBookings}
             </span>
           </div>
         </section>
@@ -172,14 +181,14 @@ export default function SlotsPage() {
         {/* Slot Selection Grid */}
         <section id="slot-picker" className="flex flex-col gap-6 select-none">
           <h3 className="font-label-lg text-label-lg text-on-surface-variant uppercase tracking-wider font-bold">
-            Available Slots
+            {s.availableSlots}
           </h3>
 
           {/* Morning Slots */}
           <div>
             <h4 className="font-label-lg text-label-lg mb-stack-sm flex items-center gap-2 font-semibold text-slate-800">
               <span className="material-symbols-outlined text-tertiary">light_mode</span>
-              Morning
+              {s.morning}
             </h4>
             <div className="grid grid-cols-3 gap-3">
               {morningSlots.map((time12) => {
@@ -211,7 +220,7 @@ export default function SlotsPage() {
           <div>
             <h4 className="font-label-lg text-label-lg mb-stack-sm flex items-center gap-2 font-semibold text-slate-800">
               <span className="material-symbols-outlined text-primary">partly_cloudy_day</span>
-              Afternoon
+              {s.afternoon}
             </h4>
             <div className="grid grid-cols-3 gap-3">
               {afternoonSlots.map((time12) => {
@@ -249,7 +258,7 @@ export default function SlotsPage() {
             <div className="bg-surface-container-lowest p-6 rounded-2xl border-2 border-primary shadow-lg mb-stack-lg flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-headline-md text-headline-md font-bold text-slate-900">
-                  Booking Details
+                  {s.bookingDetails}
                 </h3>
                 <span className="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-lg font-bold text-xs">
                   {selectedSlot}
@@ -258,19 +267,19 @@ export default function SlotsPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block font-label-lg text-label-lg mb-1 ml-1 text-on-surface-variant font-semibold">
-                    Full Name
+                    {s.fullName}
                   </label>
                   <input
                     type="text"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
                     className="w-full h-14 bg-surface-bright border border-outline-variant rounded-xl px-4 focus:ring-2 focus:ring-primary focus:border-transparent transition-all outline-none text-slate-900 font-semibold"
-                    placeholder="Enter your name"
+                    placeholder={s.enterYourName}
                   />
                 </div>
                 <div>
                   <label className="block font-label-lg text-label-lg mb-1 ml-1 text-on-surface-variant font-semibold">
-                    Phone Number
+                    {s.phoneNumber}
                   </label>
                   <input
                     type="tel"
@@ -281,7 +290,7 @@ export default function SlotsPage() {
                     maxLength={15}
                   />
                   <p className="text-[10px] text-on-surface-variant mt-1.5 ml-1">
-                    Include country code for verification
+                    {s.includeCountryCode}
                   </p>
                 </div>
               </div>
@@ -305,12 +314,12 @@ export default function SlotsPage() {
           {isProcessing ? (
             <>
               <span className="material-symbols-outlined animate-spin">sync</span>
-              <span>Processing...</span>
+              <span>{s.processing}</span>
             </>
           ) : (
             <>
               <span className="material-symbols-outlined">check_circle</span>
-              <span>Confirm Booking</span>
+              <span>{s.confirmBooking}</span>
             </>
           )}
         </button>

@@ -4,10 +4,12 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../../context/BookingContext";
 import { formatDate } from "../../lib/formatDate";
+import { strings } from "../../lib/strings";
 
 export default function ConfirmationPage() {
   const router = useRouter();
   const {
+    isHydrated,
     provider,
     slot,
     serviceType,
@@ -18,7 +20,11 @@ export default function ConfirmationPage() {
     setServiceType,
     name,
     setActiveBookingId,
+    language,
   } = useBooking();
+
+  const activeLang = language || "en";
+  const s = strings[activeLang];
 
   const [showReminder, setShowReminder] = useState(false);
   const canvasRef = useRef(null);
@@ -134,7 +140,15 @@ export default function ConfirmationPage() {
     router.push("/");
   };
 
-
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
+    );
+  }
 
   // Fallback state if no active booking details exist
   if (!provider || !slot) {
@@ -143,16 +157,16 @@ export default function ConfirmationPage() {
         <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
           <span className="material-symbols-outlined text-[40px] text-amber-600">info</span>
         </div>
-        <h1 className="font-display-sm text-display-sm text-on-surface mb-2">No Active Booking</h1>
+        <h1 className="font-display-sm text-display-sm text-on-surface mb-2">{s.noActiveBooking}</h1>
         <p className="text-on-surface-variant font-body-md mb-8">
-          We couldn&apos;t find any active booking details. Please return to the homepage to select a provider and slot.
+          {s.noActiveBookingDesc}
         </p>
         <button
           onClick={handleReturnHome}
           className="w-full max-w-xs h-[52px] bg-primary text-on-primary font-label-lg rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-md min-h-[48px] cursor-pointer"
         >
           <span className="material-symbols-outlined">home</span>
-          Return to Home
+          {s.returnToHome}
         </button>
       </div>
     );
@@ -175,11 +189,11 @@ export default function ConfirmationPage() {
         <header className="flex items-center justify-between px-page-margin w-full max-w-container-max mx-auto h-16 bg-surface dark:bg-background sticky top-0 z-50">
           <div className="flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-headline-md">check_circle</span>
-            <span className="font-headline-md text-headline-md font-bold text-primary">BookUrTime</span>
+            <span className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</span>
           </div>
           <button
             onClick={handleReturnHome}
-            className="hover:opacity-80 transition-opacity active:scale-95 duration-100 p-2 min-w-[48px] min-h-[48px] flex items-center justify-center cursor-pointer"
+            className="hover:opacity-85 active:scale-95 transition-all duration-100 p-2 min-w-[48px] min-h-[48px] flex items-center justify-center cursor-pointer"
           >
             <span className="material-symbols-outlined text-on-surface-variant">close</span>
           </button>
@@ -196,20 +210,20 @@ export default function ConfirmationPage() {
                 check_circle
               </span>
             </div>
-            <h1 className="font-display-sm text-display-sm text-on-surface mb-2">Booking Confirmed</h1>
-            <p className="text-on-surface-variant font-body-md">Your appointment has been successfully scheduled.</p>
+            <h1 className="font-display-sm text-display-sm text-on-surface mb-2">{s.bookingConfirmed}</h1>
+            <p className="text-on-surface-variant font-body-md">{s.bookingConfirmedDesc}</p>
           </div>
 
           {/* Token Number Card */}
           <div className="w-full bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 mb-stack-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] text-center">
-            <span className="font-label-lg text-label-lg text-primary uppercase tracking-widest mb-1 block">Queue Token</span>
+            <span className="font-label-lg text-label-lg text-primary uppercase tracking-widest mb-1 block">{s.queueToken}</span>
             <div className="font-display-sm text-[42px] leading-tight text-on-surface font-extrabold tracking-tight">
               {token || "..."}
             </div>
             <div className="mt-4 flex items-center justify-center gap-2 py-2 px-4 bg-surface-container-low rounded-full w-fit mx-auto">
               <span className="material-symbols-outlined text-secondary text-lg">timer</span>
               <span className="font-label-lg text-label-lg text-secondary">
-                Est. Wait: {provider.waitMinutes || 12} Mins
+                {s.estWaitLabel} {provider.waitMinutes || 12} {s.mins}
               </span>
             </div>
           </div>
@@ -222,7 +236,7 @@ export default function ConfirmationPage() {
                 <span className="material-symbols-outlined text-on-primary-container">{providerIcon}</span>
               </div>
               <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase">Provider &amp; Service</p>
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase">{s.providerServiceLabel}</p>
                 <p className="font-headline-md text-headline-md text-on-surface">{provider.name}</p>
                 <p className="font-body-md text-on-surface-variant capitalize">{provider.type || serviceType}</p>
               </div>
@@ -231,11 +245,11 @@ export default function ConfirmationPage() {
             {/* Date & Time */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-surface-container-low border border-outline-variant rounded-2xl p-5">
-                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">Date</p>
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">{s.dateLabel}</p>
                 <p className="font-label-lg text-label-lg text-on-surface">{formatDate()}</p>
               </div>
               <div className="bg-surface-container-low border border-outline-variant rounded-2xl p-5">
-                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">Time</p>
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">{s.timeLabel}</p>
                 <p className="font-label-lg text-label-lg text-on-surface">{slot}</p>
               </div>
             </div>
@@ -243,7 +257,7 @@ export default function ConfirmationPage() {
             {/* Patient Info */}
             <div className="bg-surface-container-low border border-outline-variant rounded-2xl p-5 flex items-center justify-between">
               <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">Patient Name</p>
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">{s.patientNameLabel}</p>
                 <p className="font-label-lg text-label-lg text-on-surface">{name || "Guest User"}</p>
               </div>
               <div className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container-highest text-on-surface-variant">
@@ -261,12 +275,11 @@ export default function ConfirmationPage() {
             <div className="relative bg-[#D1FAE5] text-[#065F46] p-4 rounded-2xl rounded-br-none shadow-sm flex gap-3 items-start border border-[#A7F3D0]">
               <span className="material-symbols-outlined text-[#059669] shrink-0">chat</span>
               <p className="text-sm leading-relaxed">
-                Your appointment at <strong className="font-bold">{provider.name}</strong> is confirmed for <strong className="font-bold">{slot}</strong>. Your
-                token is <strong className="font-bold">{token}</strong>. See you there!
+                {s.whatsappPrefix} <strong className="font-bold">{provider.name}</strong> {s.whatsappMiddle} <strong className="font-bold">{slot}</strong>{s.whatsappSuffix} <strong className="font-bold">{token}</strong>{s.whatsappEnd}
               </p>
               <div className="whatsapp-bubble-tail" style={{ borderTopColor: "#D1FAE5", right: 0, bottom: "-8px" }}></div>
             </div>
-            <div className="text-[10px] text-on-surface-variant text-right mt-2 font-medium opacity-60">Just now</div>
+            <div className="text-[10px] text-on-surface-variant text-right mt-2 font-medium opacity-60">{s.justNow}</div>
           </div>
         </main>
 
@@ -277,14 +290,14 @@ export default function ConfirmationPage() {
             className="w-full h-[52px] bg-primary text-on-primary font-label-lg rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-md min-h-[48px] cursor-pointer"
           >
             <span className="material-symbols-outlined">add_circle</span>
-            Book Another Appointment
+            {s.bookAnother}
           </button>
           <button
             onClick={handleReturnHome}
             className="w-full h-[52px] border border-outline text-on-surface font-label-lg rounded-xl flex items-center justify-center gap-2 hover:bg-surface-container-low active:scale-[0.98] transition-all min-h-[48px] cursor-pointer"
           >
             <span className="material-symbols-outlined">home</span>
-            Return to Home
+            {s.returnToHome}
           </button>
         </footer>
       </div>
