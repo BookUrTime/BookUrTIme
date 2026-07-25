@@ -142,7 +142,7 @@ export default function SlotsPage() {
           onClick={handleBack}
           className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center gap-1 p-2 min-touch-target cursor-pointer shrink-0"
         >
-          <span className="material-symbols-outlined">arrow_back</span>
+          <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
           <span className="font-label-lg text-label-lg font-semibold">{s.back}</span>
         </button>
         <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>

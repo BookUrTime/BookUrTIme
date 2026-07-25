@@ -35,9 +35,9 @@ export default function BookingsPage() {
   };
 
   const providerTypeLabels = {
-    hospital: { en: "Hospital", hi: "अस्पताल" },
-    aadhaar: { en: "Aadhaar", hi: "आधार" },
-    bank: { en: "Bank", hi: "बैंक" },
+    hospital: { en: "Hospital", hi: "अस्पताल", te: "ఆసుపత్రి", ta: "மருத்துவமனை", bn: "হাসপাতাল", ur: "ہسپتال" },
+    aadhaar: { en: "Aadhaar", hi: "आधार", te: "ఆధార్", ta: "ஆதார்", bn: "আধার", ur: "آدھار" },
+    bank: { en: "Bank", hi: "बैंक", te: "బ్యాంక్", ta: "வங்கி", bn: "ব্যাংক", ur: "بینک" },
   };
 
   const serviceIcons = {

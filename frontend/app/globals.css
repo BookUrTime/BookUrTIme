@@ -72,13 +72,13 @@
   --radius-3xl: 1.5rem;
 
   /* Font Families */
-  --font-headline-lg: "Inter", sans-serif;
-  --font-body-lg: "Inter", sans-serif;
-  --font-label-lg: "Inter", sans-serif;
-  --font-display-sm: "Inter", sans-serif;
-  --font-label-sm: "Inter", sans-serif;
-  --font-body-md: "Inter", sans-serif;
-  --font-headline-md: "Inter", sans-serif;
+  --font-headline-lg: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-body-lg: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-label-lg: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-display-sm: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-label-sm: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-body-md: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
+  --font-headline-md: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
 
   /* Backward compatibility shortcuts */
   --color-success: #007230;
@@ -94,9 +94,13 @@ body {
   margin: 0;
   background-color: #f7f9fb;
   color: #191c1e;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), var(--font-devanagari), var(--font-tamil), var(--font-bengali), var(--font-telugu), var(--font-urdu), sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: max(884px, 100dvh);
+}
+
+[dir="rtl"] {
+  font-family: var(--font-urdu), var(--font-inter), sans-serif;
 }
 
 .material-symbols-outlined {

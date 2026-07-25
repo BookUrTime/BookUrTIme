@@ -47,9 +47,9 @@ export default function ProvidersPage() {
   };
 
   const serviceTypeLabels = {
-    hospital: { en: "Hospitals", hi: "अस्पताल" },
-    aadhaar: { en: "Aadhaar centers", hi: "आधार केंद्र" },
-    bank: { en: "Banks", hi: "बैंक" },
+    hospital: { en: "Hospitals", hi: "अस्पताल", te: "ఆసుపత్రులు", ta: "மருத்துவமனைகள்", bn: "হাসপাতালসমূহ", ur: "ہسپتال" },
+    aadhaar: { en: "Aadhaar centers", hi: "आधार केंद्र", te: "ఆధార్ కేంద్రాలు", ta: "ஆதார் மையங்கள்", bn: "আধার কেন্দ্রসমূহ", ur: "آدھار مراكز" },
+    bank: { en: "Banks", hi: "बैंक", te: "బ్యాంకులు", ta: "வங்கிகள்", bn: "ব্যাংকসমূহ", ur: "بینک" },
   };
 
   const serviceIcons = {
@@ -95,7 +95,7 @@ export default function ProvidersPage() {
             onClick={handleBack}
             className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer"
           >
-            <span className="material-symbols-outlined">arrow_back</span>
+            <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
           </button>
           <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         </div>

@@ -113,6 +113,19 @@ export function BookingProvider({ children }) {
     return () => clearTimeout(timer);
   }, []);
 
+  // Sync HTML dir attribute for RTL support (Urdu)
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (language === "ur") {
+        document.documentElement.dir = "rtl";
+        document.documentElement.lang = "ur";
+      } else {
+        document.documentElement.dir = "ltr";
+        document.documentElement.lang = language || "en";
+      }
+    }
+  }, [language]);
+
   // Handler to book an appointment
   const bookAppointment = (prov, slotTime, userName = "Guest User") => {
     const serviceTypeMap = {

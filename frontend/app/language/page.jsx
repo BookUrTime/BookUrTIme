@@ -54,31 +54,31 @@ export default function LanguagePage() {
 
       {/* Language Selection Grid */}
       <main className="flex-grow px-page-margin flex flex-col gap-gutter justify-between">
-        <div className="grid grid-cols-1 gap-gutter">
+        <div className="grid grid-cols-2 gap-3">
           {languages.map((lang) => (
             <button
               key={lang.code}
               onClick={() => handleLanguageSelect(lang.code)}
-              className={`group relative flex items-center justify-between p-6 bg-surface-container-lowest border rounded-2xl shadow-[0px_4px_12px_rgba(0,0,0,0.03)] transition-all duration-200 hover:border-primary cursor-pointer text-left ${
+              className={`group relative flex flex-col justify-between p-4 min-h-[110px] bg-surface-container-lowest border rounded-2xl shadow-[0px_4px_12px_rgba(0,0,0,0.03)] transition-all duration-200 hover:border-primary cursor-pointer text-start ${
                 selected === lang.code ? "language-card-active" : "border-outline-variant"
               }`}
             >
-              <div className="flex items-center gap-4">
-                <div className={`w-14 h-14 rounded-full ${lang.avatarBg} flex items-center justify-center font-bold text-xl overflow-hidden select-none`}>
+              <div className="flex items-start justify-between w-full">
+                <div className={`w-10 h-10 rounded-full ${lang.avatarBg} flex items-center justify-center font-bold text-base overflow-hidden select-none shrink-0`}>
                   {lang.avatar}
                 </div>
-                <div>
-                  <p className="font-headline-md text-headline-md text-on-surface font-bold">{lang.label}</p>
-                  <p className="font-label-sm text-label-sm text-on-surface-variant">{lang.subtitle}</p>
+                {/* Custom Radio Button */}
+                <div className={`flex items-center justify-center w-5 h-5 rounded-full border-2 transition-colors bg-white shrink-0 mt-0.5 ${
+                  selected === lang.code ? "border-primary" : "border-outline-variant group-hover:border-primary"
+                }`}>
+                  <div className={`w-2 h-2 rounded-full bg-primary transition-transform ${
+                    selected === lang.code ? "scale-100" : "scale-0"
+                  }`}></div>
                 </div>
               </div>
-              {/* Custom Radio Button */}
-              <div className={`flex items-center justify-center w-6 h-6 rounded-full border-2 transition-colors bg-white ${
-                selected === lang.code ? "border-primary" : "border-outline-variant group-hover:border-primary"
-              }`}>
-                <div className={`w-2.5 h-2.5 rounded-full bg-primary transition-transform ${
-                  selected === lang.code ? "scale-100" : "scale-0"
-                }`}></div>
+              <div className="mt-2">
+                <p className="font-headline-md text-base text-on-surface font-bold leading-tight">{lang.label}</p>
+                <p className="font-label-sm text-xs text-on-surface-variant mt-0.5 line-clamp-1">{lang.subtitle}</p>
               </div>
             </button>
           ))}

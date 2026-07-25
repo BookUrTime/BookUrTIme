@@ -56,7 +56,7 @@ export default function ServicePage() {
           onClick={() => router.push("/language")}
           className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer"
         >
-          <span className="material-symbols-outlined">arrow_back</span>
+          <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
         </button>
         <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         <div className="w-12"></div> {/* Spacer balance */}
@@ -81,7 +81,7 @@ export default function ServicePage() {
                 key={cat.type}
                 id={`service-btn-${cat.type}`}
                 onClick={() => handleCardSelect(cat.type)}
-                className={`group relative flex items-start gap-4 p-5 bg-white border rounded-2xl text-left transition-all duration-200 hover:shadow-md active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary min-h-[112px] cursor-pointer ${
+                className={`group relative flex items-start gap-4 p-5 bg-white border rounded-2xl text-left rtl:text-right transition-all duration-200 hover:shadow-md active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary min-h-[112px] cursor-pointer ${
                   isActive ? "service-card-active ring-2 ring-primary border-primary" : "border-outline-variant"
                 }`}
               >
@@ -100,7 +100,7 @@ export default function ServicePage() {
                 </div>
                 {/* Arrow */}
                 <div className="self-center min-h-[48px] flex items-center shrink-0">
-                  <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors">
+                  <span className="material-symbols-outlined text-outline group-hover:text-primary transition-colors rtl:rotate-180">
                     chevron_right
                   </span>
                 </div>
@@ -133,7 +133,7 @@ export default function ServicePage() {
           className="w-full h-[52px] bg-primary text-white rounded-full font-label-lg text-label-lg shadow-md hover:bg-opacity-95 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0"
         >
           <span>{s.continueBtn}</span>
-          <span className="material-symbols-outlined">arrow_forward</span>
+          <span className="material-symbols-outlined rtl:rotate-180">arrow_forward</span>
         </button>
       </footer>
 

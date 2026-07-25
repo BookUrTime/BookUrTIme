@@ -11,8 +11,10 @@ export function Button({ children, className = "", ...props }) {
   return <button className={`rounded-2xl bg-primary px-5 py-3.5 font-semibold text-white shadow-sm transition active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 ${className}`} {...props}>{children}</button>;
 }
 
-export function Screen({ children }) {
-  return <main className="min-h-screen bg-background px-5 py-8"><div className="mx-auto w-full max-w-md pb-24">{children}</div></main>;
+export function Screen({ children, className = "" }) {
+  const { language } = useBooking();
+  const isRtl = language === "ur";
+  return <main dir={isRtl ? "rtl" : "ltr"} className={`min-h-screen bg-background p-0 ${className}`}>{children}</main>;
 }
 
 export function BottomNavBar() {

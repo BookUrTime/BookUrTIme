@@ -137,7 +137,7 @@ export default function Home() {
               ) : (
                 <>
                   <span>{s.getStarted}</span>
-                  <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">
+                  <span className="material-symbols-outlined group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 transition-transform">
                     arrow_forward
                   </span>
                 </>
