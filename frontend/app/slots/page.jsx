@@ -11,6 +11,7 @@ export default function SlotsPage() {
   const {
     isHydrated,
     provider,
+    providerList,
     slot,
     setSlot,
     name,
@@ -59,6 +60,9 @@ export default function SlotsPage() {
     );
   }
 
+  // Get current provider from dynamic providerList to include newly added or unblocked slots
+  const currentProvider = (providerList || []).find((p) => p.id === provider.id) || provider;
+
   // Helper to convert 24hr slot ("14:30") to 12hr AM/PM ("02:30 PM")
   const convertToAMPM = (time24) => {
     const [hourStr, minStr] = time24.split(":");
@@ -79,14 +83,14 @@ export default function SlotsPage() {
     return `${String(hour).padStart(2, "0")}:${minStr}`;
   };
 
-  const activeBookedSlots = getBookedSlots(provider);
+  const activeBookedSlots = getBookedSlots(currentProvider);
 
-  // Grouping slots
-  const morningSlots = provider.slots
+  // Grouping slots using currentProvider
+  const morningSlots = (currentProvider.slots || [])
     .filter((time) => parseInt(time.slice(0, 2)) < 12)
     .map(convertToAMPM);
 
-  const afternoonSlots = provider.slots
+  const afternoonSlots = (currentProvider.slots || [])
     .filter((time) => parseInt(time.slice(0, 2)) >= 12)
     .map(convertToAMPM);
 
@@ -157,16 +161,16 @@ export default function SlotsPage() {
           <div className="flex items-center gap-4 mb-2">
             <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-primary-container/10 flex items-center justify-center text-primary">
               <span className="material-symbols-outlined text-3xl">
-                {serviceIcons[provider.type] || "local_hospital"}
+                {serviceIcons[currentProvider.type] || "local_hospital"}
               </span>
             </div>
             <div>
               <h2 className="font-headline-md text-headline-md text-on-surface font-bold leading-tight">
-                {provider.name}
+                {currentProvider.name}
               </h2>
               <p className="font-label-lg text-label-lg text-on-surface-variant flex items-center gap-1 mt-0.5">
                 <span className="material-symbols-outlined text-sm">schedule</span>
-                {s.estWaitPrefix} {provider.waitMinutes} {s.mins}
+                {s.estWaitPrefix} {currentProvider.waitMinutes || 15} {s.mins}
               </p>
             </div>
           </div>

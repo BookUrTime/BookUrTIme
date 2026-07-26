@@ -26,8 +26,8 @@ export function BottomNavBar() {
   const tabs = [
     { key: "home", name: s.navHome, icon: "home", href: "/service" },
     { key: "bookings", name: s.navBookings, icon: "event_note", href: "/bookings" },
+    { key: "provider", name: "Provider", icon: "admin_panel_settings", href: "/provider/dashboard" },
     { key: "support", name: s.navSupport, icon: "support_agent", href: "#" },
-    { key: "account", name: s.navAccount, icon: "person", href: "#" },
   ];
   
   return (

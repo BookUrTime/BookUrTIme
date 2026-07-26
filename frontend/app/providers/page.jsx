@@ -11,7 +11,7 @@ import { strings } from "../../lib/strings";
 
 export default function ProvidersPage() {
   const router = useRouter();
-  const { isHydrated, serviceType, setProvider, getBookedSlots, language } = useBooking();
+  const { isHydrated, serviceType, setProvider, getBookedSlots, language, providerList } = useBooking();
   const activeLang = language || "en";
   const s = strings[activeLang];
   const [filter, setFilter] = useState("nearest"); // 'nearest' or 'shortest'
@@ -37,8 +37,11 @@ export default function ProvidersPage() {
     router.push("/service");
   };
 
+  // Use dynamic providerList from context (fallback to static providers import if empty)
+  const activeProviders = providerList && providerList.length > 0 ? providerList : providers;
+
   // Find providers matching serviceType
-  const matches = providers.filter((p) => p.type === serviceType);
+  const matches = activeProviders.filter((p) => p.type === serviceType);
 
   // Sorting logic based on filter
   const sortedMatches = [...matches].sort((a, b) => {

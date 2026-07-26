@@ -49,12 +49,23 @@ export default function Home() {
         <div className="font-headline-md text-headline-md font-bold text-primary">
           {s.brandName}
         </div>
-        <button
-          onClick={() => router.push("/language")}
-          className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:opacity-85 active:scale-95 transition-all cursor-pointer"
-        >
-          <span className="material-symbols-outlined">language</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => router.push("/provider/dashboard")}
+            className="px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            title="Open Provider Console"
+          >
+            <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
+            <span>Provider Console</span>
+          </button>
+          <button
+            onClick={() => router.push("/language")}
+            className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:opacity-85 active:scale-95 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            title="Change language"
+          >
+            <span className="material-symbols-outlined">language</span>
+          </button>
+        </div>
       </header>
 
       {/* Hero Content Section */}
