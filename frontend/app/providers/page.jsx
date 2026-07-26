@@ -15,6 +15,15 @@ export default function ProvidersPage() {
   const activeLang = language || "en";
   const s = strings[activeLang];
   const [filter, setFilter] = useState("nearest"); // 'nearest' or 'shortest'
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate live data fetch with skeleton state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 450);
+    return () => clearTimeout(timer);
+  }, [serviceType]);
 
   // Guard: redirect to /service if serviceType is missing AFTER hydration
   useEffect(() => {
@@ -58,14 +67,14 @@ export default function ProvidersPage() {
     bank: "account_balance",
   };
 
-  // Dynamic wait color classes based on time
+  // Dynamic wait color classes based on time with high WCAG AA contrast
   const getWaitBadgeClass = (minutes) => {
     if (minutes < 15) {
-      return "bg-secondary-container text-on-secondary-container";
+      return "bg-emerald-50 text-[#047857] border border-emerald-200/70 font-semibold";
     } else if (minutes <= 30) {
-      return "bg-tertiary-container/10 text-tertiary";
+      return "bg-amber-50 text-[#b45309] border border-amber-200/70 font-semibold";
     } else {
-      return "bg-error-container text-on-error-container";
+      return "bg-red-50 text-[#b91c1c] border border-red-200/70 font-semibold";
     }
   };
 
@@ -93,41 +102,52 @@ export default function ProvidersPage() {
         <div className="flex items-center gap-4">
           <button
             onClick={handleBack}
-            className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer"
+            className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
           >
             <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
           </button>
           <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         </div>
-        <button className="text-on-surface-variant hover:opacity-80 transition-opacity min-touch-target flex items-center justify-center cursor-pointer">
+        <button className="text-on-surface-variant hover:opacity-80 transition-opacity min-touch-target flex items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
           <span className="material-symbols-outlined">search</span>
         </button>
       </header>
 
       {/* Main Content Area */}
       <main className="flex-grow px-page-margin pb-32 pt-6">
-        {/* Map Header Graphic */}
-        <div className="relative w-full h-48 mb-stack-lg rounded-2xl overflow-hidden shadow-sm select-none">
+        {/* Map Header Graphic (Clickable to Google Maps) */}
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sortedMatches[0]?.address || "New Delhi, Delhi, India")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="relative w-full h-48 mb-stack-lg rounded-2xl overflow-hidden shadow-sm select-none block group cursor-pointer active:scale-[0.99] transition-all border border-outline-variant/50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+          title="Open area map in Google Maps"
+        >
           <Image
-            className="absolute inset-0 w-full h-full object-cover"
-            alt="New Delhi area map background placeholder representation"
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            alt="New Delhi area map background representation"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNohjW9DHCkc9CLifavyjsWkDgfY6YywxN65UzVEEzJd822WHl98lAkV1F_R-05mPsGIG1yxKkuKnTCs7Ekv2Uq14afpKLivWCHEsBv_Dz28PgU3voMSMxOnIIw3MUP4ScKvdVE8ez7wRyQABIdLWmyK1cDaoIae_docKyz50CoJirKDw9T9LlVd8eBy_V_M8kdKY6m30SyZeJcHedHiv-ahlJ82iyui66JFOHq47SoT0G36tNXRxfdaTWArIhUR14vx21RDB6vQ"
             fill
             sizes="(max-width: 448px) 100vw, 448px"
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
           <div className="absolute bottom-4 left-4 text-white">
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-sm">location_on</span>
               <span className="font-label-lg text-label-lg font-semibold">{s.newDelhi}</span>
             </div>
           </div>
-        </div>
+          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-slate-800 px-3 py-1.5 rounded-full font-label-sm text-xs font-semibold shadow-md group-hover:bg-white flex items-center gap-1.5 cursor-pointer">
+            <span className="material-symbols-outlined text-primary text-sm">map</span>
+            <span>View on Map</span>
+            <span className="material-symbols-outlined text-xs text-slate-500">open_in_new</span>
+          </div>
+        </a>
 
         {/* Headings */}
         <div className="mb-stack-lg">
-          <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm">
+          <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm font-semibold">
             {serviceTypeLabels[serviceType]?.[activeLang] || serviceTypeLabels[serviceType]?.en || "Services"} {s.nearYou}
           </h2>
           <p className="font-body-md text-on-surface-variant">
@@ -139,7 +159,7 @@ export default function ProvidersPage() {
         <div className="flex border-b border-outline-variant mb-stack-lg select-none">
           <button
             onClick={() => setFilter("nearest")}
-            className={`flex-1 py-3 font-label-lg text-label-lg transition-colors min-touch-target cursor-pointer text-center ${
+            className={`flex-1 py-3 font-label-lg text-label-lg transition-colors min-touch-target cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
               filter === "nearest"
                 ? "border-b-2 border-primary text-primary font-bold"
                 : "text-on-surface-variant hover:text-primary"
@@ -149,7 +169,7 @@ export default function ProvidersPage() {
           </button>
           <button
             onClick={() => setFilter("shortest")}
-            className={`flex-1 py-3 font-label-lg text-label-lg transition-colors min-touch-target cursor-pointer text-center ${
+            className={`flex-1 py-3 font-label-lg text-label-lg transition-colors min-touch-target cursor-pointer text-center focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
               filter === "shortest"
                 ? "border-b-2 border-primary text-primary font-bold"
                 : "text-on-surface-variant hover:text-primary"
@@ -159,70 +179,108 @@ export default function ProvidersPage() {
           </button>
         </div>
 
-        {/* Dynamic Provider Cards List */}
+        {/* Dynamic Provider Cards List or Skeleton Loader */}
         <div className="space-y-4">
-          {sortedMatches.map((prov) => {
-            const icon = serviceIcons[prov.type] || "local_hospital";
-            const waitClass = getWaitBadgeClass(prov.waitMinutes);
-            const nextAvailable = getNextAvailableSlot(prov);
-
-            return (
+          {isLoading ? (
+            /* Skeleton Loading State */
+            Array.from({ length: 3 }).map((_, idx) => (
               <div
-                key={prov.id}
-                onClick={() => handleBook(prov)}
-                className="bg-white rounded-2xl p-4 border border-outline-variant shadow-sm hover:border-primary transition-all cursor-pointer group flex flex-col justify-between"
+                key={idx}
+                className="bg-white rounded-2xl p-4 border border-outline-variant shadow-sm animate-pulse flex flex-col justify-between"
               >
-                {/* Card Top Row */}
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0">
-                      <span className="material-symbols-outlined text-2xl">{icon}</span>
-                    </div>
-                    <div>
-                      <h3 className="font-headline-md text-[18px] text-on-surface font-semibold group-hover:text-primary transition-colors leading-tight">
-                        {prov.name}
-                      </h3>
-                      <p className="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 mt-1">
-                        <span className="material-symbols-outlined text-[14px]">near_me</span>
-                        {prov.distanceKm} {s.kmAway}
-                      </p>
+                    <div className="w-12 h-12 rounded-xl bg-slate-200 shrink-0"></div>
+                    <div className="space-y-2">
+                      <div className="h-5 w-40 bg-slate-200 rounded-md"></div>
+                      <div className="h-3 w-24 bg-slate-200 rounded-md"></div>
                     </div>
                   </div>
-                  <div className={`px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0 ${waitClass}`}>
-                    {prov.waitMinutes} {s.min} {s.waitLabel}
-                  </div>
+                  <div className="h-6 w-20 bg-slate-200 rounded-full"></div>
                 </div>
-
-                {/* Card Bottom Row */}
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
-                  <div className="space-y-0.5">
-                    <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
-                      {formatDate()}
-                    </p>
-                    <p className="font-body-md text-on-surface text-sm">
-                      {s.next} <strong className="font-bold text-slate-800">{nextAvailable}</strong>
-                    </p>
+                  <div className="space-y-1">
+                    <div className="h-3 w-16 bg-slate-200 rounded-md"></div>
+                    <div className="h-4 w-28 bg-slate-200 rounded-md"></div>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); // Avoid double click triggers
-                      handleBook(prov);
-                    }}
-                    className="bg-primary text-white px-6 py-2 rounded-full font-label-lg text-label-lg hover:opacity-95 active:scale-95 transition-all shadow-md group-hover:shadow-primary/20 min-touch-target cursor-pointer"
-                  >
-                    {s.book}
-                  </button>
+                  <div className="h-9 w-20 bg-slate-200 rounded-full"></div>
                 </div>
               </div>
-            );
-          })}
+            ))
+          ) : (
+            sortedMatches.map((prov) => {
+              const icon = serviceIcons[prov.type] || "local_hospital";
+              const waitClass = getWaitBadgeClass(prov.waitMinutes);
+              const nextAvailable = getNextAvailableSlot(prov);
 
-          {sortedMatches.length === 0 && (
+              return (
+                <div
+                  key={prov.id}
+                  onClick={() => handleBook(prov)}
+                  className="bg-white rounded-2xl p-4 border border-outline-variant shadow-sm hover:border-primary active:scale-[0.98] transition-all cursor-pointer group flex flex-col justify-between focus-within:ring-2 focus-within:ring-primary"
+                >
+                  {/* Card Top Row */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+                        <span className="material-symbols-outlined text-2xl">{icon}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-headline-md text-[18px] text-on-surface font-semibold group-hover:text-primary transition-colors leading-tight">
+                          {prov.name}
+                        </h3>
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(prov.address || prov.name + ", New Delhi")}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="font-label-sm text-xs text-primary hover:underline flex items-center gap-1 mt-1 cursor-pointer w-fit focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                          title="Open location in Google Maps"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">location_on</span>
+                          <span>{prov.distanceKm} {s.kmAway}</span>
+                          <span className="text-slate-400">•</span>
+                          <span className="line-clamp-1 underline">{prov.address ? prov.address.split(",")[1] || prov.address : "New Delhi"}</span>
+                          <span className="material-symbols-outlined text-[12px] opacity-70">open_in_new</span>
+                        </a>
+                      </div>
+                    </div>
+                    <div className={`px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0 ${waitClass}`}>
+                      {prov.waitMinutes} {s.min} {s.waitLabel}
+                    </div>
+                  </div>
+
+                  {/* Card Bottom Row */}
+                  <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-50">
+                    <div className="space-y-0.5">
+                      <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+                        {formatDate()}
+                      </p>
+                      <p className="font-body-md text-on-surface text-sm">
+                        {s.next} <strong className="font-bold text-slate-800">{nextAvailable}</strong>
+                      </p>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation(); // Avoid double click triggers
+                        handleBook(prov);
+                      }}
+                      className="bg-primary text-white px-6 py-2 rounded-full font-label-lg text-label-lg hover:opacity-95 active:scale-95 transition-all shadow-md group-hover:shadow-primary/20 min-touch-target cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                    >
+                      {s.book}
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+
+          {!isLoading && sortedMatches.length === 0 && (
             <div className="bg-white rounded-2xl p-6 border border-outline-variant text-center">
               <p className="text-on-surface-variant">{s.noProvidersFound}</p>
               <button
                 onClick={handleBack}
-                className="mt-4 text-primary font-semibold hover:underline"
+                className="mt-4 text-primary font-semibold hover:underline cursor-pointer"
               >
                 {s.goBackChooseService}
               </button>

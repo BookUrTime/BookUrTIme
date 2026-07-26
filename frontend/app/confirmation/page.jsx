@@ -55,7 +55,7 @@ export default function ConfirmationPage() {
     }
   }, [provider, slot]);
 
-  // Confetti Animation Logic
+  // Confetti Burst Animation Logic (Brief 2-second celebratory burst)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !provider || !slot) return;
@@ -72,48 +72,75 @@ export default function ConfirmationPage() {
     window.addEventListener("resize", resizeCanvas);
 
     const pieces = [];
-    const numberOfPieces = 50;
-    const colors = ["#2563EB", "#62df7d", "#ffb77d", "#b4c5ff"];
+    const numberOfPieces = 130;
+    const colors = ["#2563EB", "#007230", "#824500", "#3b82f6", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"];
+    const shapes = ["rect", "circle", "strip"];
 
-    function createPiece() {
-      return {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        rotation: Math.random() * 360,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        size: Math.random() * 8 + 4,
-        speed: Math.random() * 3 + 2,
-      };
-    }
+    const originX = canvas.width / 2;
+    const originY = canvas.height * 0.35;
 
     for (let i = 0; i < numberOfPieces; i++) {
-      pieces.push(createPiece());
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 12 + 4;
+      pieces.push({
+        x: originX,
+        y: originY,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - Math.random() * 6,
+        gravity: 0.25,
+        drag: 0.97,
+        rotation: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 12,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        size: Math.random() * 8 + 4,
+      });
     }
 
-    function updateConfetti() {
+    const startTime = performance.now();
+    const DURATION = 2000; // Finish within 2 seconds
+
+    function updateConfetti(currentTime) {
+      const elapsed = currentTime - startTime;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      if (elapsed >= DURATION) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        return; // Stop animation loop after 2 seconds
+      }
+
+      // Calculate smooth fade out in the last 600ms
+      const globalOpacity = elapsed > 1400 ? Math.max(0, 1 - (elapsed - 1400) / 600) : 1;
+
       pieces.forEach((p) => {
-        p.y += p.speed;
-        p.rotation += p.speed;
+        p.vx *= p.drag;
+        p.vy = p.vy * p.drag + p.gravity;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
 
         ctx.save();
+        ctx.globalAlpha = globalOpacity;
         ctx.translate(p.x, p.y);
         ctx.rotate((p.rotation * Math.PI) / 180);
         ctx.fillStyle = p.color;
-        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
-        ctx.restore();
 
-        if (p.y > canvas.height) {
-          p.y = -20;
-          p.x = Math.random() * canvas.width;
+        if (p.shape === "circle") {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (p.shape === "strip") {
+          ctx.fillRect(-p.size / 4, -p.size, p.size / 2, p.size * 1.8);
+        } else {
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
         }
+        ctx.restore();
       });
 
       animationFrameId = requestAnimationFrame(updateConfetti);
     }
 
-    updateConfetti();
+    animationFrameId = requestAnimationFrame(updateConfetti);
 
     return () => {
       window.removeEventListener("resize", resizeCanvas);

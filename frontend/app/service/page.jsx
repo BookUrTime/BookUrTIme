@@ -54,7 +54,7 @@ export default function ServicePage() {
       <header className="bg-surface fixed top-0 w-full max-w-container-max mx-auto h-16 z-50 flex items-center justify-between px-page-margin border-b border-outline-variant/10">
         <button
           onClick={() => router.push("/language")}
-          className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer"
+          className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
         >
           <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
         </button>
@@ -63,10 +63,10 @@ export default function ServicePage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-grow pt-24 pb-32 px-page-margin">
+      <main className="flex-grow pt-20 pb-[160px] px-page-margin">
         {/* Headings */}
         <div className="mb-stack-lg">
-          <h2 className="font-headline-lg text-headline-lg text-on-surface">{s.whatNeedToBook}</h2>
+          <h2 className="font-headline-lg text-headline-lg text-on-surface font-semibold">{s.whatNeedToBook}</h2>
           <p className="text-on-surface-variant mt-2 font-body-md text-body-md">
             {s.selectCategoryDesc}
           </p>
@@ -110,8 +110,8 @@ export default function ServicePage() {
         </div>
 
         {/* Atmospheric Office Building Illustration */}
-        <div className="mt-12 opacity-80 select-none">
-          <div className="w-full h-48 rounded-3xl overflow-hidden relative grayscale-[0.2]">
+        <div className="mt-8 opacity-80 select-none">
+          <div className="w-full h-36 max-h-[150px] rounded-2xl overflow-hidden relative grayscale-[0.2]">
             <Image
               className="w-full h-full object-cover"
               alt="Clean architectural minimalist office building facade represent trust and reliability"
@@ -125,12 +125,12 @@ export default function ServicePage() {
         </div>
       </main>
 
-      {/* Sticky Bottom Action Continue Button */}
-      <footer className="fixed bottom-16 left-0 right-0 w-full max-w-container-max mx-auto bg-surface-container-lowest/80 backdrop-blur-md px-page-margin py-4 border-t border-outline-variant/30 flex flex-col gap-2 z-[40]">
+      {/* Sticky Action Continue Button Footer - Fixed directly above BottomNavBar (72px) */}
+      <footer className="fixed bottom-[72px] left-0 right-0 w-full max-w-container-max mx-auto bg-surface-container-lowest/95 backdrop-blur-md px-page-margin py-3 border-t border-outline-variant/30 shadow-[0_-4px_12px_rgba(0,0,0,0.06)] flex flex-col gap-2 z-[40]">
         <button
           onClick={handleContinue}
           disabled={!selected}
-          className="w-full h-[52px] bg-primary text-white rounded-full font-label-lg text-label-lg shadow-md hover:bg-opacity-95 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          className="w-full h-[52px] bg-primary text-white rounded-full font-label-lg text-label-lg shadow-md hover:bg-opacity-95 active:scale-95 transition-all disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shrink-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <span>{s.continueBtn}</span>
           <span className="material-symbols-outlined rtl:rotate-180">arrow_forward</span>

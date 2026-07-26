@@ -31,7 +31,7 @@ export function BottomNavBar() {
   ];
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto flex justify-around items-center px-4 py-3 pb-6 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.04)] rounded-t-2xl z-50 border-t border-outline-variant/30 select-none">
+    <nav className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto h-[72px] flex justify-around items-center px-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl z-50 border-t border-outline-variant/30 select-none">
       {tabs.map((tab) => {
         // Tab is active if pathname matches exactly, or if Home is matched by subroutes
         const isActive = pathname === tab.href || (tab.key === "home" && (pathname === "/service" || pathname === "/providers" || pathname === "/slots"));
@@ -40,14 +40,14 @@ export function BottomNavBar() {
           <Link
             key={tab.key}
             href={tab.href}
-            className={`flex flex-col items-center justify-center p-2 min-touch-target transition duration-200 cursor-pointer ${
+            className={`flex flex-col items-center justify-center py-1 px-3 min-touch-target transition duration-200 cursor-pointer ${
               isActive
-                ? "bg-secondary-container text-on-secondary-container rounded-full px-4 py-1.5 scale-95"
+                ? "bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95"
                 : "text-on-surface-variant hover:text-primary"
             }`}
           >
             <span className="material-symbols-outlined text-2xl">{tab.icon}</span>
-            <span className="font-label-sm text-label-sm mt-0.5">{tab.name}</span>
+            <span className="font-label-sm text-[11px] leading-none mt-1 font-medium">{tab.name}</span>
           </Link>
         );
       })}

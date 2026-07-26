@@ -200,13 +200,14 @@ export default function SlotsPage() {
                   <button
                     key={time12}
                     disabled={isBooked}
+                    aria-disabled={isBooked}
                     onClick={() => handleSlotSelect(time12)}
-                    className={`slot-pill h-12 flex items-center justify-center border rounded-xl font-label-lg transition-all text-sm font-semibold select-none ${
+                    className={`slot-pill h-12 flex items-center justify-center border rounded-xl font-label-lg transition-all text-sm font-semibold select-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none ${
                       isBooked
-                        ? "slot-pill disabled"
+                        ? "slot-pill disabled cursor-not-allowed"
                         : isSelected
-                        ? "slot-pill active"
-                        : "border-outline-variant hover:bg-surface-container-high cursor-pointer"
+                        ? "slot-pill active animate-slot-snap border-2 border-primary shadow-sm"
+                        : "border-outline-variant hover:bg-surface-container-high hover:border-primary/50 active:scale-95 cursor-pointer"
                     }`}
                   >
                     {time12.replace(" AM", "")}
@@ -232,13 +233,14 @@ export default function SlotsPage() {
                   <button
                     key={time12}
                     disabled={isBooked}
+                    aria-disabled={isBooked}
                     onClick={() => handleSlotSelect(time12)}
-                    className={`slot-pill h-12 flex items-center justify-center border rounded-xl font-label-lg transition-all text-sm font-semibold select-none ${
+                    className={`slot-pill h-12 flex items-center justify-center border rounded-xl font-label-lg transition-all text-sm font-semibold select-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none ${
                       isBooked
-                        ? "slot-pill disabled"
+                        ? "slot-pill disabled cursor-not-allowed"
                         : isSelected
-                        ? "slot-pill active"
-                        : "border-outline-variant hover:bg-surface-container-high cursor-pointer"
+                        ? "slot-pill active animate-slot-snap border-2 border-primary shadow-sm"
+                        : "border-outline-variant hover:bg-surface-container-high hover:border-primary/50 active:scale-95 cursor-pointer"
                     }`}
                   >
                     {time12.replace(" PM", "")}

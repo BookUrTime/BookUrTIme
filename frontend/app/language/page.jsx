@@ -59,7 +59,7 @@ export default function LanguagePage() {
             <button
               key={lang.code}
               onClick={() => handleLanguageSelect(lang.code)}
-              className={`group relative flex flex-col justify-between p-4 min-h-[110px] bg-surface-container-lowest border rounded-2xl shadow-[0px_4px_12px_rgba(0,0,0,0.03)] transition-all duration-200 hover:border-primary cursor-pointer text-start ${
+              className={`group relative flex flex-col justify-between p-4 min-h-[110px] bg-surface-container-lowest border rounded-2xl shadow-[0px_4px_12px_rgba(0,0,0,0.03)] transition-all duration-200 hover:border-primary active:scale-95 cursor-pointer text-start focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none ${
                 selected === lang.code ? "language-card-active" : "border-outline-variant"
               }`}
             >
