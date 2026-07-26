@@ -19,14 +19,14 @@ export function Screen({ children, className = "" }) {
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  const { language } = useBooking();
+  const { language, switchRole, isProviderAccount } = useBooking();
   const activeLang = language || "en";
   const s = strings[activeLang];
   
   const tabs = [
     { key: "home", name: s.navHome, icon: "home", href: "/service" },
     { key: "bookings", name: s.navBookings, icon: "event_note", href: "/bookings" },
-    { key: "provider", name: "Provider", icon: "admin_panel_settings", href: "/provider/dashboard" },
+    { key: "provider", name: isProviderAccount ? "Console" : "Provider", icon: "admin_panel_settings", href: "/provider/dashboard" },
     { key: "support", name: s.navSupport, icon: "support_agent", href: "#" },
   ];
   
@@ -40,6 +40,13 @@ export function BottomNavBar() {
           <Link
             key={tab.key}
             href={tab.href}
+            onClick={() => {
+              if (tab.key === "provider") {
+                switchRole("provider");
+              } else if (tab.key === "home" || tab.key === "bookings") {
+                switchRole("patient");
+              }
+            }}
             className={`flex flex-col items-center justify-center py-1 px-3 min-touch-target transition duration-200 cursor-pointer ${
               isActive
                 ? "bg-secondary-container text-on-secondary-container rounded-full px-4 py-1 scale-95"

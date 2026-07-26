@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useBooking } from "../../../context/BookingContext";
 import { Screen } from "../../../components/UI";
 
 export default function ProviderLoginPage() {
   const router = useRouter();
+  const { switchRole } = useBooking();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +18,7 @@ export default function ProviderLoginPage() {
       setIsLoading(true);
       // Demo: any credentials pass after a brief delay
       setTimeout(() => {
-        router.push("/provider/dashboard");
+        switchRole("provider", router);
       }, 800);
     }
   };
@@ -100,7 +102,7 @@ export default function ProviderLoginPage() {
       {/* Footer */}
       <footer className="p-page-margin pb-12 shrink-0">
         <button
-          onClick={() => router.push("/")}
+          onClick={() => switchRole("patient", router)}
           className="w-full text-center font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
         >
           ← Back to patient booking

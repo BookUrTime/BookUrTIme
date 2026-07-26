@@ -12,6 +12,7 @@ export default function ProviderDashboardPage() {
     isHydrated,
     bookings,
     providerList,
+    switchRole,
     updateBookingStatus,
     updateProviderWaitTime,
     addProviderSlot,
@@ -243,7 +244,7 @@ export default function ProviderDashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => router.push("/service")}
+            onClick={() => switchRole("patient", router)}
             className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all cursor-pointer font-bold text-xs flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
             title="Switch to Patient App"
           >
