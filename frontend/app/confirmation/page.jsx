@@ -272,8 +272,19 @@ export default function ConfirmationPage() {
               </div>
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase">{s.providerServiceLabel}</p>
-                <p className="font-headline-md text-headline-md text-on-surface">{provider.name}</p>
+                <p className="font-headline-md text-headline-md text-on-surface font-semibold">{provider.name}</p>
                 <p className="font-body-md text-on-surface-variant">{displayType}</p>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(provider.address || provider.name + ", New Delhi")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary font-semibold hover:underline mt-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                  title="Get Directions on Google Maps"
+                >
+                  <span className="material-symbols-outlined text-sm">location_on</span>
+                  <span className="line-clamp-1">{provider.address || "New Delhi, Delhi"}</span>
+                  <span className="material-symbols-outlined text-xs">open_in_new</span>
+                </a>
               </div>
             </div>
 
