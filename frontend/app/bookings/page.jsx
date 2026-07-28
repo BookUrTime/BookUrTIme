@@ -163,10 +163,14 @@ export default function BookingsPage() {
                           {s.noBtn}
                         </button>
                         <button
-                          onClick={(e) => {
+                          onClick={async (e) => {
                             e.stopPropagation();
-                            cancelAppointment(booking.id);
-                            setConfirmCancelId("");
+                            try {
+                              await cancelAppointment(booking.id);
+                              setConfirmCancelId("");
+                            } catch (error) {
+                              alert(error.message || "Unable to cancel this booking.");
+                            }
                           }}
                           className="px-3 py-1.5 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition cursor-pointer"
                         >

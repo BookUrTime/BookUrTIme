@@ -2,8 +2,21 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { providers } from "../lib/dummyData";
+import { cancelBooking, createBooking, fetchProviders, fetchSlots, isNetworkError } from "../lib/api";
 
 const BookingContext = createContext(null);
+const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND !== "false";
+
+const today = () => new Date().toISOString().slice(0, 10);
+
+const to24Hour = (time) => {
+  const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(time || "");
+  if (!match) return time;
+  let hour = Number(match[1]);
+  if (match[3].toUpperCase() === "PM" && hour !== 12) hour += 12;
+  if (match[3].toUpperCase() === "AM" && hour === 12) hour = 0;
+  return `${String(hour).padStart(2, "0")}:${match[2]}`;
+};
 
 export function BookingProvider({ children }) {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -19,6 +32,8 @@ export function BookingProvider({ children }) {
   const [bookings, setBookings] = useState([]);
   const [activeBookingId, setActiveBookingIdState] = useState("");
   const [providerList, setProviderListState] = useState(providers);
+  const [providersLoading, setProvidersLoading] = useState(false);
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
   // Role & Mode State (Airbnb-style Universal App Mode Switching)
   const [userRole, setUserRoleState] = useState("patient"); // 'patient' | 'provider'
@@ -90,6 +105,13 @@ export function BookingProvider({ children }) {
     }
   };
 
+  const saveProviderList = (newList) => {
+    setProviderListState(newList);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("bookurtime_provider_list", JSON.stringify(newList));
+    }
+  };
+
   // Hydrate from localStorage AFTER initial mount (asynchronous to avoid set-state-in-effect rule)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -141,7 +163,7 @@ export function BookingProvider({ children }) {
           if (parsedBookings.length > 0) {
             const active = parsedBookings.find((b) => b.id === storedActiveId);
             if (active) {
-              const foundProvider = providers.find((p) => p.id === active.providerId);
+              const foundProvider = parsedProviders.find((p) => p.id === active.providerId) || providers.find((p) => p.id === active.providerId);
               if (foundProvider) {
                 setProvider(foundProvider);
                 setSlot(active.slot);
@@ -162,6 +184,60 @@ export function BookingProvider({ children }) {
     return () => clearTimeout(timer);
   }, []);
 
+  const loadProviders = async (type = serviceType) => {
+    if (!useBackend) return providerList;
+    setProvidersLoading(true);
+    try {
+      const remoteProviders = await fetchProviders(type);
+      saveProviderList(remoteProviders);
+      return remoteProviders;
+    } catch (error) {
+      if (!isNetworkError(error)) throw error;
+      return providerList.length > 0 ? providerList : providers;
+    } finally {
+      setProvidersLoading(false);
+    }
+  };
+
+  const loadSlots = async (providerId) => {
+    if (!providerId || !useBackend) return null;
+    setSlotsLoading(true);
+    try {
+      const remoteSlots = await fetchSlots(providerId, today());
+      const slotTimes = remoteSlots.map((item) => to24Hour(item.startTime));
+      const bookedSlots = remoteSlots.filter((item) => item.isBooked).map((item) => to24Hour(item.startTime));
+      const update = (item) => item.id === providerId ? { ...item, slots: slotTimes, bookedSlots } : item;
+      const updatedList = providerList.map(update);
+      saveProviderList(updatedList);
+      const updatedProvider = updatedList.find((item) => item.id === providerId);
+      if (updatedProvider && provider?.id === providerId) setProvider(updatedProvider);
+      return updatedProvider;
+    } catch (error) {
+      if (!isNetworkError(error)) throw error;
+      return null;
+    } finally {
+      setSlotsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isHydrated && serviceType) {
+      const timer = setTimeout(() => loadProviders(serviceType).catch(() => {}), 0);
+      return () => clearTimeout(timer);
+    }
+    // The API failure path intentionally retains the local provider list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHydrated, serviceType]);
+
+  useEffect(() => {
+    if (isHydrated && provider?.id) {
+      const timer = setTimeout(() => loadSlots(provider.id).catch(() => {}), 0);
+      return () => clearTimeout(timer);
+    }
+    // The API failure path intentionally retains the local slots.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHydrated, provider?.id]);
+
   // Sync HTML dir attribute for RTL support (Urdu)
   useEffect(() => {
     if (typeof document !== "undefined") {
@@ -176,7 +252,7 @@ export function BookingProvider({ children }) {
   }, [language]);
 
   // Handler to book an appointment
-  const bookAppointment = (prov, slotTime, userName = "Guest User") => {
+  const bookAppointment = async (prov, slotTime, userName = "Guest User", userPhone = "") => {
     const serviceTypeMap = {
       hospital: "HC",
       aadhaar: "AK",
@@ -187,7 +263,7 @@ export function BookingProvider({ children }) {
     const randomDigits = String(Math.floor(1000 + Math.random() * 9000));
     const generatedToken = `${prefix}-${randomDigits}`;
 
-    const newBooking = {
+    let newBooking = {
       id: Math.random().toString(36).substr(2, 9),
       providerId: prov.id,
       providerName: prov.name,
@@ -197,6 +273,19 @@ export function BookingProvider({ children }) {
       name: userName || "Guest User",
       date: new Date().toISOString(),
     };
+
+    if (useBackend) {
+      try {
+        newBooking = await createBooking({
+          providerId: prov.id,
+          slot: slotTime,
+          name: userName || "Guest User",
+          phone: userPhone,
+        });
+      } catch (error) {
+        if (!isNetworkError(error)) throw error;
+      }
+    }
 
     const updatedBookings = [newBooking, ...bookings];
     saveBookings(updatedBookings);
@@ -213,9 +302,30 @@ export function BookingProvider({ children }) {
   };
 
   // Handler to cancel an appointment
-  const cancelAppointment = (bookingId) => {
+  const cancelAppointment = async (bookingId) => {
+    const bookingToCancel = bookings.find((item) => item.id === bookingId);
+    let cancelledRemotely = false;
+    if (useBackend) {
+      try {
+        await cancelBooking(bookingId);
+        cancelledRemotely = true;
+      } catch (error) {
+        if (!isNetworkError(error)) throw error;
+      }
+    }
     const updatedBookings = bookings.filter((b) => b.id !== bookingId);
     saveBookings(updatedBookings);
+
+    if (bookingToCancel) {
+      if (cancelledRemotely) {
+        await loadSlots(bookingToCancel.providerId);
+      } else {
+        const cancelledTime = to24Hour(bookingToCancel.slot);
+        saveProviderList(providerList.map((item) => item.id === bookingToCancel.providerId
+          ? { ...item, bookedSlots: (item.bookedSlots || []).filter((time) => time !== cancelledTime) }
+          : item));
+      }
+    }
 
     if (activeBookingId === bookingId) {
       saveActiveBookingId("");
@@ -232,7 +342,7 @@ export function BookingProvider({ children }) {
     const staticBooked = prov.bookedSlots || [];
     const dynamicBooked = bookings
       .filter((b) => b.providerId === prov.id)
-      .map((b) => b.slot);
+      .map((b) => to24Hour(b.slot));
     return [...new Set([...staticBooked, ...dynamicBooked])];
   };
 
@@ -241,7 +351,7 @@ export function BookingProvider({ children }) {
     const active = bookings.find((b) => b.id === bookingId);
     if (active) {
       saveActiveBookingId(bookingId);
-      const foundProvider = providers.find((p) => p.id === active.providerId);
+      const foundProvider = providerList.find((p) => p.id === active.providerId) || providers.find((p) => p.id === active.providerId);
       if (foundProvider) {
         setProvider(foundProvider);
         setSlot(active.slot);
@@ -249,14 +359,6 @@ export function BookingProvider({ children }) {
         setName(active.name);
         setServiceType(active.providerType);
       }
-    }
-  };
-
-  // Provider state management
-  const saveProviderList = (newList) => {
-    setProviderListState(newList);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("bookurtime_provider_list", JSON.stringify(newList));
     }
   };
 
@@ -391,10 +493,14 @@ export function BookingProvider({ children }) {
         setToken,
         bookings,
         providerList,
+        providersLoading,
+        slotsLoading,
         activeBookingId,
         setActiveBookingId: saveActiveBookingId,
         bookAppointment,
         cancelAppointment,
+        loadProviders,
+        loadSlots,
         getBookedSlots,
         viewBookingDetails,
         updateBookingStatus,

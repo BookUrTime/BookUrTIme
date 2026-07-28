@@ -11,19 +11,10 @@ import { strings } from "../../lib/strings";
 
 export default function ProvidersPage() {
   const router = useRouter();
-  const { isHydrated, serviceType, setProvider, getBookedSlots, language, providerList } = useBooking();
+  const { isHydrated, serviceType, setProvider, getBookedSlots, language, providerList, providersLoading } = useBooking();
   const activeLang = language || "en";
   const s = strings[activeLang];
   const [filter, setFilter] = useState("nearest"); // 'nearest' or 'shortest'
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Simulate live data fetch with skeleton state
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 450);
-    return () => clearTimeout(timer);
-  }, [serviceType]);
 
   // Guard: redirect to /service if serviceType is missing AFTER hydration
   useEffect(() => {
@@ -184,7 +175,7 @@ export default function ProvidersPage() {
 
         {/* Dynamic Provider Cards List or Skeleton Loader */}
         <div className="space-y-4">
-          {isLoading ? (
+          {providersLoading ? (
             /* Skeleton Loading State */
             Array.from({ length: 3 }).map((_, idx) => (
               <div
@@ -278,7 +269,7 @@ export default function ProvidersPage() {
             })
           )}
 
-          {!isLoading && sortedMatches.length === 0 && (
+          {!providersLoading && sortedMatches.length === 0 && (
             <div className="bg-white rounded-2xl p-6 border border-outline-variant text-center">
               <p className="text-on-surface-variant">{s.noProvidersFound}</p>
               <button

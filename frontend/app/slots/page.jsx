@@ -20,7 +20,8 @@ export default function SlotsPage() {
     setPhone,
     bookAppointment,
     getBookedSlots,
-    language
+    language,
+    slotsLoading,
   } = useBooking();
 
   const activeLang = language || "en";
@@ -57,6 +58,16 @@ export default function SlotsPage() {
           </button>
         </div>
       </Screen>
+    );
+  }
+
+  if (slotsLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-4xl animate-spin">
+          progress_activity
+        </span>
+      </div>
     );
   }
 
@@ -109,7 +120,7 @@ export default function SlotsPage() {
     }, 100);
   };
 
-  const handleConfirmBooking = () => {
+  const handleConfirmBooking = async () => {
     if (selectedSlot && userName.trim().length >= 2 && userPhone.trim().length >= 8) {
       setIsProcessing(true);
       
@@ -118,11 +129,13 @@ export default function SlotsPage() {
       setPhone(userPhone);
       setSlot(selectedSlot);
       
-      // Simulate API processing delay (1.5s as requested by HTML code script)
-      setTimeout(() => {
-        bookAppointment(provider, selectedSlot, userName);
+      try {
+        await bookAppointment(provider, selectedSlot, userName, userPhone);
         router.push("/confirmation");
-      }, 1500);
+      } catch (error) {
+        setIsProcessing(false);
+        alert(error.message || "Unable to book this slot. Please choose another time.");
+      }
     }
   };
 
