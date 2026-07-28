@@ -36,7 +36,7 @@ export function BookingProvider({ children }) {
   const [slotsLoading, setSlotsLoading] = useState(false);
 
   // Role & Mode State (Airbnb-style Universal App Mode Switching)
-  const [userRole, setUserRoleState] = useState("patient"); // 'patient' | 'provider'
+  const [userRole, setUserRoleState] = useState("guest"); // 'guest' | 'provider'
   const [isProviderAccount, setIsProviderAccountState] = useState(false);
 
   const setRole = (role) => {
@@ -410,8 +410,8 @@ export function BookingProvider({ children }) {
     saveProviderList(updatedList);
   };
 
-  // Handler for provider to directly appoint a slot for a patient (walk-in / phone booking)
-  const providerCreateAppointment = (providerId, { slotTime, patientName, patientPhone, desk = "Counter 1", notes = "" }) => {
+  // Handler for a provider to directly appoint a guest (walk-in / phone booking).
+  const providerCreateAppointment = (providerId, { slotTime, guestName, guestPhone, desk = "Counter 1", notes = "" }) => {
     const targetProvider = providerList.find((p) => p.id === providerId) || providers.find((p) => p.id === providerId);
     if (!targetProvider) return null;
 
@@ -432,8 +432,8 @@ export function BookingProvider({ children }) {
       providerType: targetProvider.type,
       slot: slotTime,
       token: generatedToken,
-      name: patientName || "Walk-in Patient",
-      phone: patientPhone || "",
+      name: guestName || "Walk-in Guest",
+      phone: guestPhone || "",
       desk: desk,
       notes: notes,
       status: "waiting",

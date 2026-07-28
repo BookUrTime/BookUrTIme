@@ -300,10 +300,10 @@ export default function ConfirmationPage() {
               </div>
             </div>
 
-            {/* Patient Info */}
+            {/* Guest Info */}
             <div className="bg-surface-container-low border border-outline-variant rounded-2xl p-5 flex items-center justify-between">
               <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">{s.patientNameLabel}</p>
+                <p className="font-label-sm text-label-sm text-on-surface-variant uppercase mb-1">{s.guestNameLabel}</p>
                 <p className="font-label-lg text-label-lg text-on-surface">{name || "Guest User"}</p>
               </div>
               <div className="w-10 h-10 rounded-full border border-outline-variant flex items-center justify-center bg-surface-container-highest text-on-surface-variant">

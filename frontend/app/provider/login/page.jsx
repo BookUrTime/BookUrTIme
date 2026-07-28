@@ -35,7 +35,7 @@ export default function ProviderLoginPage() {
           <span className="font-label-lg text-label-lg text-primary tracking-widest font-bold">PROVIDER PORTAL</span>
           <h1 className="font-display-sm text-display-sm text-on-surface">Sign in to your dashboard</h1>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Manage your queue, view appointments, and track patient flow.
+            Manage your queue, view appointments, and track guest flow.
           </p>
         </div>
       </header>
@@ -102,10 +102,10 @@ export default function ProviderLoginPage() {
       {/* Footer */}
       <footer className="p-page-margin pb-12 shrink-0">
         <button
-          onClick={() => switchRole("patient", router)}
+          onClick={() => switchRole("guest", router)}
           className="w-full text-center font-label-lg text-label-lg text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
         >
-          ← Back to patient booking
+          ← Back to booking
         </button>
       </footer>
     </Screen>

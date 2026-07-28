@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../../../context/BookingContext";
 import { Screen } from "../../../components/UI";
 import { formatDate } from "../../../lib/formatDate";
+import { fetchDashboardMetrics, fetchUpcoming } from "../../../lib/api";
+
+const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND !== "false";
+const today = () => new Date().toISOString().slice(0, 10);
 
 export default function ProviderDashboardPage() {
   const router = useRouter();
@@ -30,6 +34,8 @@ export default function ProviderDashboardPage() {
   const [newSlotTime, setNewSlotTime] = useState("");
   const [showAddSlot, setShowAddSlot] = useState(false);
   const [confirmCancelId, setConfirmCancelId] = useState("");
+  const [dashboardMetrics, setDashboardMetrics] = useState(null);
+  const [dashboardBookings, setDashboardBookings] = useState(null);
 
   // Direct Appointment Modal State (Walk-in Dispatcher)
   const [showAppointModal, setShowAppointModal] = useState(false);
@@ -66,6 +72,25 @@ export default function ProviderDashboardPage() {
     }
   };
 
+  useEffect(() => {
+    if (!isHydrated || !selectedProviderId || !useBackend) return;
+    const timer = setTimeout(async () => {
+      try {
+        const [metrics, upcoming] = await Promise.all([
+          fetchDashboardMetrics(selectedProviderId, today()),
+          fetchUpcoming(selectedProviderId, today()),
+        ]);
+        setDashboardMetrics(metrics);
+        setDashboardBookings(upcoming);
+      } catch {
+        // Preserve the localStorage queue and computed stats when offline.
+        setDashboardMetrics(null);
+        setDashboardBookings(null);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [isHydrated, selectedProviderId]);
+
   if (!isHydrated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -77,22 +102,23 @@ export default function ProviderDashboardPage() {
   }
 
   // Filter bookings by selected provider
-  const providerBookings = bookings.filter((b) => b.providerId === activeProvider.id || !b.providerId);
+  const localProviderBookings = bookings.filter((b) => b.providerId === activeProvider.id || !b.providerId);
+  const providerBookings = dashboardBookings ?? localProviderBookings;
 
   // Find currently serving booking & next in queue
   const currentlyServing = providerBookings.find((b) => b.status === "in-progress");
   const nextInQueue = providerBookings.find((b) => !b.status || b.status === "waiting");
 
   // Stats calculation
-  const totalBookings = providerBookings.length;
-  const waitingCount = providerBookings.filter((b) => !b.status || b.status === "waiting").length;
-  const completedCount = providerBookings.filter((b) => b.status === "completed").length;
+  const totalBookings = dashboardMetrics?.totalBookings ?? providerBookings.length;
+  const waitingCount = dashboardMetrics?.waitingCount ?? providerBookings.filter((b) => !b.status || b.status === "waiting").length;
+  const completedCount = dashboardMetrics?.completedCount ?? providerBookings.filter((b) => b.status === "completed").length;
 
   // Capacity calculation
   const allBookedSlotTimes = getBookedSlots(activeProvider);
-  const totalSlotsCount = (activeProvider.slots || []).length || 1;
-  const bookedSlotsCount = allBookedSlotTimes.length;
-  const capacityPercent = Math.min(100, Math.round((bookedSlotsCount / totalSlotsCount) * 100));
+  const totalSlotsCount = dashboardMetrics?.totalSlotsCount ?? ((activeProvider.slots || []).length || 1);
+  const bookedSlotsCount = dashboardMetrics?.bookedSlotsCount ?? allBookedSlotTimes.length;
+  const capacityPercent = dashboardMetrics?.capacityPercent ?? Math.min(100, Math.round((bookedSlotsCount / totalSlotsCount) * 100));
 
   // Available slots for manual appointing
   const availableSlotsForProvider = (activeProvider.slots || []).filter(
@@ -126,8 +152,8 @@ export default function ProviderDashboardPage() {
 
     const created = providerCreateAppointment(activeProvider.id, {
       slotTime: appointSlot,
-      patientName: appointName || "Walk-in Patient",
-      patientPhone: appointPhone,
+      guestName: appointName || "Walk-in Guest",
+      guestPhone: appointPhone,
       desk: appointDesk,
       notes: appointNotes,
     });
@@ -159,7 +185,7 @@ export default function ProviderDashboardPage() {
       alert("No appointments available to export.");
       return;
     }
-    const headers = ["Token", "Patient Name", "Phone", "Slot", "Desk", "Status", "Notes", "Date"];
+    const headers = ["Token", "Guest Name", "Phone", "Slot", "Desk", "Status", "Notes", "Date"];
     const rows = providerBookings.map((b) => [
       `"${b.token || ""}"`,
       `"${b.name || "Guest"}"`,
@@ -244,12 +270,12 @@ export default function ProviderDashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => switchRole("patient", router)}
+            onClick={() => switchRole("guest", router)}
             className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 active:scale-95 transition-all cursor-pointer font-bold text-xs flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-            title="Switch to Patient App"
+            title="Switch to Booking App"
           >
             <span className="material-symbols-outlined text-sm">swap_horiz</span>
-            <span>Patient App</span>
+            <span>Booking App</span>
           </button>
           <button
             onClick={() => router.push("/provider/login")}
@@ -284,7 +310,7 @@ export default function ProviderDashboardPage() {
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
               <span className="font-label-sm text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                Connected to Patient App
+                Connected to Booking App
               </span>
             </div>
           </div>
@@ -317,7 +343,7 @@ export default function ProviderDashboardPage() {
             <button
               onClick={handleExportRosterCSV}
               className="px-3 py-2.5 bg-surface-container-low border border-outline-variant text-slate-700 hover:bg-slate-100 rounded-xl font-bold text-xs flex items-center justify-center gap-1 cursor-pointer"
-              title="Download patient log as CSV"
+              title="Download booking log as CSV"
             >
               <span className="material-symbols-outlined text-base">download</span>
               <span>Export CSV</span>
@@ -378,7 +404,7 @@ export default function ProviderDashboardPage() {
                   </h2>
                 </div>
                 <div className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-bold">
-                  {waitingCount} Patients Waiting
+                  {waitingCount} Guests Waiting
                 </div>
               </div>
 
@@ -411,7 +437,7 @@ export default function ProviderDashboardPage() {
                 </div>
               ) : (
                 <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/20 mb-4 text-center">
-                  <p className="text-sm text-white/90 font-medium">No patient currently inside.</p>
+                  <p className="text-sm text-white/90 font-medium">No guest is currently being served.</p>
                   {nextInQueue && (
                     <p className="text-xs text-white/70 mt-1">
                       Next up: <strong>{nextInQueue.token}</strong> ({nextInQueue.name})
@@ -427,7 +453,7 @@ export default function ProviderDashboardPage() {
                 className="w-full py-3.5 bg-white text-primary rounded-xl font-bold text-base shadow-md hover:bg-slate-50 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 <span className="material-symbols-outlined text-xl">campaign</span>
-                <span>{currentlyServing ? "Complete & Call Next Token" : "Call Next Patient Token"}</span>
+                <span>{currentlyServing ? "Complete & Call Next Token" : "Call Next Guest Token"}</span>
               </button>
             </div>
 
@@ -436,7 +462,7 @@ export default function ProviderDashboardPage() {
               <div>
                 <h3 className="font-headline-md text-base font-bold text-on-surface">Live Estimated Wait Time</h3>
                 <p className="font-body-md text-xs text-on-surface-variant mt-0.5">
-                  Directly impacts estimated wait badge displayed to patients.
+                  Directly impacts the estimated wait badge shown to guests.
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -491,7 +517,7 @@ export default function ProviderDashboardPage() {
               ))}
             </div>
 
-            {/* Patients Queue List */}
+            {/* Guest Queue List */}
             <div className="space-y-3">
               {filteredQueue.length > 0 ? (
                 filteredQueue.map((booking) => (
@@ -507,7 +533,7 @@ export default function ProviderDashboardPage() {
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-slate-900">{booking.token}</span>
                           <span className="text-slate-400">•</span>
-                          <span className="font-semibold text-slate-800 text-sm">{booking.name || "Guest Patient"}</span>
+                          <span className="font-semibold text-slate-800 text-sm">{booking.name || "Guest"}</span>
                           {booking.createdBy === "provider" && (
                             <span className="text-[10px] bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold">
                               Walk-in
@@ -576,7 +602,7 @@ export default function ProviderDashboardPage() {
                 ))
               ) : (
                 <div className="bg-white rounded-2xl p-6 border border-outline-variant text-center text-slate-500 text-sm">
-                  No patient appointments matching active filter.
+                  No bookings matching the active filter.
                 </div>
               )}
             </div>
@@ -811,7 +837,7 @@ export default function ProviderDashboardPage() {
               </button>
 
               <h3 className="font-headline-md text-lg font-bold text-slate-900 mb-1">
-                Appoint Slot for Patient
+                Appoint Slot for Guest
               </h3>
               <p className="text-xs text-slate-500 mb-4">
                 Walk-in or telephone appointment dispatch for {activeProvider.name}.
@@ -847,7 +873,7 @@ export default function ProviderDashboardPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">Patient Name</label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Guest Name</label>
                     <input
                       type="text"
                       value={appointName}

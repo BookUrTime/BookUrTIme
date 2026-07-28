@@ -44,7 +44,7 @@ export function BottomNavBar() {
               if (tab.key === "provider") {
                 switchRole("provider");
               } else if (tab.key === "home" || tab.key === "bookings") {
-                switchRole("patient");
+                switchRole("guest");
               }
             }}
             className={`flex flex-col items-center justify-center py-1 px-3 min-touch-target transition duration-200 cursor-pointer ${

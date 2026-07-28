@@ -71,3 +71,13 @@ export function createBooking({ providerId, slot, name, phone }) {
 export function cancelBooking(bookingId) {
   return request(`/bookings/${encodeURIComponent(bookingId)}`, { method: "DELETE" });
 }
+
+export function fetchDashboardMetrics(providerId, date) {
+  const query = new URLSearchParams({ providerId, date });
+  return request(`/dashboard/metrics?${query}`);
+}
+
+export function fetchUpcoming(providerId, date) {
+  const query = new URLSearchParams({ providerId, date });
+  return request(`/dashboard/upcoming?${query}`);
+}
