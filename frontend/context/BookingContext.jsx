@@ -147,10 +147,11 @@ export function BookingProvider({ children }) {
           }
         }
 
+        let parsedProviders = [];
         const storedProviders = localStorage.getItem("bookurtime_provider_list");
         if (storedProviders) {
           try {
-            const parsedProviders = JSON.parse(storedProviders);
+            parsedProviders = JSON.parse(storedProviders);
             setProviderListState(parsedProviders);
           } catch (e) {
             console.error("Failed to parse provider list from localStorage", e);

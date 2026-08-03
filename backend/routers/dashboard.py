@@ -1,38 +1,35 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from typing import List
 from datetime import date
+from fastapi import APIRouter, Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
 from database import get_db
-import models, schemas
+from models import Booking, Slot
+from routers.bookings import booking_dto
+from schemas import BookingResponse, DashboardMetricsResponse
 
 router = APIRouter(tags=["Dashboard"])
 
-@router.get("/provider/{provider_id}/dashboard", response_model=List[schemas.DashboardBookingResponse])
-async def get_dashboard(provider_id: int, date: date, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(models.Booking, models.User, models.Slot)
-        .join(models.User, models.Booking.user_id == models.User.id)
-        .join(models.Slot, models.Booking.slot_id == models.Slot.id)
-        .where(
-            models.Slot.provider_id == provider_id,
-            models.Slot.date == date
-        )
-        .order_by(models.Slot.start_time)
-    )
-    
-    rows = result.all()
-    dashboard_data = []
-    for booking, user, slot in rows:
-        dashboard_data.append(
-            schemas.DashboardBookingResponse(
-                booking_id=booking.id,
-                user_name=user.name,
-                user_phone=user.phone,
-                slot_start=slot.start_time,
-                slot_end=slot.end_time,
-                status=booking.status,
-                reason=booking.reason
-            )
-        )
-    return dashboard_data
+
+async def provider_bookings(provider_id: str, day: date, db: AsyncSession):
+    result = await db.execute(select(Booking).options(joinedload(Booking.slot).joinedload(Slot.provider), joinedload(Booking.user)).join(Slot).where(Slot.provider_id == provider_id, Slot.date == day).order_by(Slot.start_time))
+    return result.unique().scalars().all()
+
+
+@router.get("/dashboard/upcoming", response_model=list[BookingResponse])
+async def upcoming(providerId: str, date: date, db: AsyncSession = Depends(get_db)):
+    return [booking_dto(booking) for booking in await provider_bookings(providerId, date, db)]
+
+
+@router.get("/dashboard/metrics", response_model=DashboardMetricsResponse)
+async def metrics(providerId: str, date: date, db: AsyncSession = Depends(get_db)):
+    bookings = await provider_bookings(providerId, date, db)
+    slots = (await db.execute(select(Slot).where(Slot.provider_id == providerId, Slot.date == date))).scalars().all()
+    total = len(slots) or 1
+    return DashboardMetricsResponse(totalBookings=len(bookings), waitingCount=sum(b.status in ("waiting", "confirmed") for b in bookings), completedCount=sum(b.status == "completed" for b in bookings), bookedSlotsCount=sum(s.is_booked for s in slots), totalSlotsCount=len(slots), capacityPercent=round(sum(s.is_booked for s in slots) / total * 100))
+
+
+@router.get("/provider/{provider_id}/dashboard", response_model=list[BookingResponse])
+async def get_dashboard(provider_id: str, date: date, db: AsyncSession = Depends(get_db)):
+    return [booking_dto(booking) for booking in await provider_bookings(provider_id, date, db)]

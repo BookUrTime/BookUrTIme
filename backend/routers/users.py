@@ -1,25 +1,17 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from typing import List
-from datetime import date
+
 from database import get_db
-import models, schemas
+from models import Booking, Slot
+from routers.bookings import booking_dto
+from schemas import BookingResponse
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-@router.get("/{user_id}/bookings", response_model=List[schemas.BookingResponse])
+
+@router.get("/{user_id}/bookings", response_model=list[BookingResponse])
 async def get_user_bookings(user_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(models.Booking)
-        .options(joinedload(models.Booking.slot))
-        .join(models.Slot)
-        .where(
-            models.Booking.user_id == user_id,
-            models.Booking.status == models.BookingStatusEnum.confirmed,
-            models.Slot.date >= date.today()
-        )
-        .order_by(models.Slot.date, models.Slot.start_time)
-    )
-    return result.scalars().all()
+    result = await db.execute(select(Booking).options(joinedload(Booking.slot).joinedload(Slot.provider), joinedload(Booking.user)).where(Booking.user_id == user_id).order_by(Booking.created_at.desc()))
+    return [booking_dto(booking) for booking in result.unique().scalars().all()]

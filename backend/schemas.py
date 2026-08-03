@@ -1,79 +1,69 @@
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import date, time, datetime
-from models import LanguageEnum, ProviderTypeEnum, BookingStatusEnum
+import datetime as dt
+from typing import Literal, Optional
+from pydantic import BaseModel, Field
 
-class UserBase(BaseModel):
+
+class ProviderResponse(BaseModel):
+    id: str
     name: str
-    phone: str
-    language: LanguageEnum = LanguageEnum.english
+    type: Literal["hospital", "aadhaar", "bank"]
+    address: str
+    distanceKm: float
+    waitMinutes: int
+    slots: list[str]
+    bookedSlots: list[str]
 
-class UserCreate(UserBase):
-    pass
 
-class UserResponse(UserBase):
-    id: int
-    created_at: datetime
-    class Config:
-        orm_mode = True
+class BookingCreate(BaseModel):
+    providerId: str = Field(..., max_length=100)
+    slot: str = Field(..., max_length=50)
+    date: Optional[dt.date] = None
 
-class ProviderBase(BaseModel):
+    name: str = Field("Guest User", max_length=100)
+    phone: str = Field("", max_length=30)
+    # Optional fields with strict length validation
+    reason: Optional[str] = Field(None, max_length=500)
+    desk: Optional[str] = Field(None, max_length=100)
+    notes: Optional[str] = Field(None, max_length=500)
+    createdBy: Optional[str] = Field(None, max_length=100)
+
+
+
+
+class BookingResponse(BaseModel):
+    id: str
+    providerId: str
+    providerName: str
+    providerType: str
+    slot: str
+    token: str
     name: str
-    type: ProviderTypeEnum
-    address: Optional[str] = None
-    city: str
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    working_hours_start: time
-    working_hours_end: time
-    slot_duration_minutes: int
-    is_active: bool = True
+    phone: Optional[str] = None
+    desk: Optional[str] = None
+    notes: Optional[str] = None
+    status: Optional[str] = None
+    createdBy: Optional[str] = None
+    date: str
 
-class ProviderCreate(ProviderBase):
-    pass
 
-class ProviderResponse(ProviderBase):
+class SlotResponse(BaseModel):
     id: int
-    created_at: datetime
-    class Config:
-        orm_mode = True
+    providerId: str
+    date: dt.date
+    startTime: str
+    endTime: str
+    isBooked: bool
 
-class SlotBase(BaseModel):
-    provider_id: int
-    date: date
-    start_time: time
-    end_time: time
-    is_booked: bool = False
 
-class SlotCreate(SlotBase):
-    pass
 
-class SlotResponse(SlotBase):
-    id: int
-    created_at: datetime
-    class Config:
-        orm_mode = True
+class BookingStatusUpdate(BaseModel):
+    status: Literal["waiting", "in-progress", "completed", "cancelled", "no-show"]
 
-class BookingBase(BaseModel):
-    user_id: int
-    slot_id: int
-    reason: Optional[str] = None
 
-class BookingCreate(BookingBase):
-    pass
-
-class BookingResponse(BookingBase):
-    id: int
-    status: BookingStatusEnum
-    created_at: datetime
-    class Config:
-        orm_mode = True
-
-class DashboardBookingResponse(BaseModel):
-    booking_id: int
-    user_name: str
-    user_phone: str
-    slot_start: time
-    slot_end: time
-    status: BookingStatusEnum
-    reason: Optional[str]
+class DashboardMetricsResponse(BaseModel):
+    totalBookings: int
+    waitingCount: int
+    completedCount: int
+    bookedSlotsCount: int
+    totalSlotsCount: int
+    capacityPercent: int
