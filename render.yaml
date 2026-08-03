@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bookurtime-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./apnaslot.db
+      - key: ALLOWED_ORIGINS
+        value: https://book-ur-time.vercel.app,http://localhost:3000
