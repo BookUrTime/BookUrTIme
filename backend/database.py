@@ -3,7 +3,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import declarative_base
 from config import settings
 
-is_sqlite = settings.DATABASE_URL.startswith("sqlite")
+# Render (and most Postgres providers) issue postgres:// URLs; asyncpg requires
+# the postgresql+asyncpg:// scheme. Rewrite here before anything consumes the URL.
+db_url = settings.DATABASE_URL
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+
+is_sqlite = db_url.startswith("sqlite")
 
 engine_kwargs = {
     "future": True,
@@ -12,7 +18,8 @@ engine_kwargs = {
 if is_sqlite:
     engine_kwargs["connect_args"] = {"check_same_thread": False}
 
-engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
+engine = create_async_engine(db_url, **engine_kwargs)
+
 
 if is_sqlite:
     @event.listens_for(engine.sync_engine, "connect")

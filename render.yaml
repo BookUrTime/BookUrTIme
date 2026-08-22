@@ -7,6 +7,12 @@ services:
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite+aiosqlite:///./apnaslot.db
+        fromDatabase:
+          name: bookurtime-db
+          property: connectionString
       - key: ALLOWED_ORIGINS
         value: https://book-ur-time.vercel.app,http://localhost:3000
+
+databases:
+  - name: bookurtime-db
+    plan: free

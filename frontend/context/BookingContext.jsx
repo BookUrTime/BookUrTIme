@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { providers } from "../lib/dummyData";
-import { cancelBooking, createBooking, fetchProviders, fetchSlots, isNetworkError } from "../lib/api";
+import { cancelBooking, createBooking, fetchProviders, fetchSlots, isNetworkError, updateBookingStatusApi } from "../lib/api";
 
 const BookingContext = createContext(null);
 const useBackend = process.env.NEXT_PUBLIC_USE_BACKEND !== "false";
@@ -363,11 +363,21 @@ export function BookingProvider({ children }) {
     }
   };
 
-  const updateBookingStatus = (bookingId, newStatus) => {
+  const updateBookingStatus = async (bookingId, newStatus) => {
+    // Optimistic local update first so the UI feels instant
     const updatedBookings = bookings.map((b) =>
       b.id === bookingId ? { ...b, status: newStatus } : b
     );
     saveBookings(updatedBookings);
+
+    if (useBackend) {
+      try {
+        await updateBookingStatusApi(bookingId, newStatus);
+      } catch (error) {
+        if (!isNetworkError(error)) throw error;
+        // Backend unreachable — keep the optimistic local update as fallback
+      }
+    }
   };
 
   const updateProviderWaitTime = (providerId, newMinutes) => {
@@ -412,7 +422,7 @@ export function BookingProvider({ children }) {
   };
 
   // Handler for a provider to directly appoint a guest (walk-in / phone booking).
-  const providerCreateAppointment = (providerId, { slotTime, guestName, guestPhone, desk = "Counter 1", notes = "" }) => {
+  const providerCreateAppointment = async (providerId, { slotTime, guestName, guestPhone, desk = "Counter 1", notes = "" }) => {
     const targetProvider = providerList.find((p) => p.id === providerId) || providers.find((p) => p.id === providerId);
     if (!targetProvider) return null;
 
@@ -426,7 +436,7 @@ export function BookingProvider({ children }) {
     const randomDigits = String(Math.floor(1000 + Math.random() * 9000));
     const generatedToken = `${prefix}-${randomDigits}`;
 
-    const newBooking = {
+    let newBooking = {
       id: Math.random().toString(36).substr(2, 9),
       providerId: targetProvider.id,
       providerName: targetProvider.name,
@@ -435,15 +445,38 @@ export function BookingProvider({ children }) {
       token: generatedToken,
       name: guestName || "Walk-in Guest",
       phone: guestPhone || "",
-      desk: desk,
-      notes: notes,
+      desk,
+      notes,
       status: "waiting",
       createdBy: "provider",
       date: new Date().toISOString(),
     };
 
+    if (useBackend) {
+      try {
+        newBooking = await createBooking({
+          providerId: targetProvider.id,
+          slot: slotTime,
+          name: guestName || "Walk-in Guest",
+          phone: guestPhone,
+          desk,
+          notes,
+          createdBy: "provider",
+        });
+      } catch (error) {
+        if (!isNetworkError(error)) throw error;
+        // Backend unreachable — fall back to the locally generated booking above
+      }
+    }
+
     const updatedBookings = [newBooking, ...bookings];
     saveBookings(updatedBookings);
+
+    // Refresh slots so the booked slot shows as unavailable everywhere
+    if (useBackend) {
+      loadSlots(targetProvider.id).catch(() => {});
+    }
+
     return newBooking;
   };
 

@@ -61,15 +61,22 @@ export function fetchSlots(providerId, date) {
   return request(`/providers/${encodeURIComponent(providerId)}/slots?date=${encodeURIComponent(date)}`);
 }
 
-export function createBooking({ providerId, slot, name, phone }) {
+export function createBooking({ providerId, slot, name, phone, desk, notes, createdBy }) {
   return request("/bookings", {
     method: "POST",
-    body: JSON.stringify({ providerId, slot, name, phone }),
+    body: JSON.stringify({ providerId, slot, name, phone, desk, notes, createdBy }),
   });
 }
 
 export function cancelBooking(bookingId) {
   return request(`/bookings/${encodeURIComponent(bookingId)}`, { method: "DELETE" });
+}
+
+export function updateBookingStatusApi(bookingId, status) {
+  return request(`/bookings/${encodeURIComponent(bookingId)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
 }
 
 export function fetchDashboardMetrics(providerId, date) {

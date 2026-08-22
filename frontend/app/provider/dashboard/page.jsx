@@ -136,21 +136,21 @@ export default function ProviderDashboardPage() {
   });
 
   // Call Next Token Action
-  const handleCallNext = () => {
+  const handleCallNext = async () => {
     if (currentlyServing) {
-      updateBookingStatus(currentlyServing.id, "completed");
+      await updateBookingStatus(currentlyServing.id, "completed");
     }
     if (nextInQueue) {
-      updateBookingStatus(nextInQueue.id, "in-progress");
+      await updateBookingStatus(nextInQueue.id, "in-progress");
     }
   };
 
   // Submit Direct Provider Appointment (Walk-in/Phone)
-  const handleCreateDirectAppointment = (e) => {
+  const handleCreateDirectAppointment = async (e) => {
     e.preventDefault();
     if (!appointSlot) return;
 
-    const created = providerCreateAppointment(activeProvider.id, {
+    const created = await providerCreateAppointment(activeProvider.id, {
       slotTime: appointSlot,
       guestName: appointName || "Walk-in Guest",
       guestPhone: appointPhone,
