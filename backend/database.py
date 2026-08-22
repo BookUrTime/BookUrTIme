@@ -6,7 +6,9 @@ from config import settings
 # Render (and most Postgres providers) issue postgres:// URLs; asyncpg requires
 # the postgresql+asyncpg:// scheme. Rewrite here before anything consumes the URL.
 db_url = settings.DATABASE_URL
-if db_url.startswith("postgres://"):
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+elif db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
 
 is_sqlite = db_url.startswith("sqlite")
