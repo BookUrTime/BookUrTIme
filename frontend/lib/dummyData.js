@@ -136,6 +136,69 @@ export const languages = [
   { code: "ur", label: "Urdu (اردو)", avatar: "ا", subtitle: "اردو میں جاری رکھیں", avatarBg: "bg-secondary-container text-on-secondary-container" },
 ];
 
+export const categoryTranslations = {
+  hospital: {
+    en: { label: "Health & Clinic", subtitle: "General Physicians, Diagnostics, Pediatrics & Pathology Blood Tests" },
+    hi: { label: "स्वास्थ्य एवं क्लीनिक", subtitle: "सामान्य चिकित्सक, विशेषज्ञ डॉक्टर, रक्त एवं पैथोलॉजी टेस्ट" },
+    te: { label: "ఆరోగ్యం & క్లినిక్", subtitle: "జనరల్ ఫిజీషియన్లు, స్పెషలిస్ట్ వైద్యులు, రక్త & పాథాలజీ పరీక్షలు" },
+    ta: { label: "மருத்துவம் & கிளினிக்", subtitle: "பொது மருத்துவர்கள், நிபுணர் ஆலோசனைகள், ரத்தப் பரிசோதனை" },
+    bn: { label: "স্বাস্থ্য ও ক্লিনিক", subtitle: "সাধারণ চিকিৎসক, বিশেষজ্ঞ ডাক্তার, রক্ত ও প্যাথলজি পরীক্ষা" },
+    ur: { label: "صحت اور کلینک", subtitle: "عام معالجین، ماہر ڈاکٹرز، خون اور پیتھالوجی ٹیسٹ" },
+  },
+  salon: {
+    en: { label: "Salon & Spa Studio", subtitle: "Precision Haircut, Beard Grooming, Organic Facials & Body Massage" },
+    hi: { label: "सैलून एवं स्पा स्टूडियो", subtitle: "हेयरकट, दाढ़ी संवारना, फेशियल एवं मसाज" },
+    te: { label: "సెలూన్ & స్పా స్టూడియో", subtitle: "హెయిర్‌కట్, గడ్డం గ్రూమింగ్, సేంద్రీయ ఫేషియల్స్ & మసాజ్" },
+    ta: { label: "சலூன் & ஸ்பா ஸ்டுடியோ", subtitle: "ஹேர்கட், தாடி வடிவமைப்பு, ஃபேஷியல் & மசாஜ்" },
+    bn: { label: "সেলুন ও স্পা স্টুডিও", subtitle: "চুল কাটা, দাড়ি সাজানো, ফেসিয়াল ও ম্যাসাজ" },
+    ur: { label: "سیلون اور سپا اسٹوڈیو", subtitle: "ہیر کٹ، داڑھی کی گرومنگ، فیشل اور مساج" },
+  },
+  dental: {
+    en: { label: "Dental Care & Ortho", subtitle: "Comprehensive Checkups, Ultrasonic Cleaning, Digital X-Rays & Root Canal" },
+    hi: { label: "दंत चिकित्सा एवं ऑर्थो", subtitle: "दांतों की सफाई, एक्स-रे एवं रूट कैनाल" },
+    te: { label: "దంత సంరక్షణ & ఆర్థో", subtitle: "దంతాల క్లీనింగ్, డిజిటల్ ఎక్స్-రే & రూట్ కెనాల్" },
+    ta: { label: "பல் பராமரிப்பு & ஆர்த்தோ", subtitle: "பல் சுத்தம், டிஜிட்டல் எக்ஸ்ரே & ரூட் கெனால்" },
+    bn: { label: "দন্ত চিকিৎসা ও অর্থো", subtitle: "দাঁত পরিষ্কার, ডিজিটাল এক্স-রে ও রুট ক্যানেল" },
+    ur: { label: "دانتوں کا علاج اور آرتھو", subtitle: "دانتوں کی صفائی، ڈیجیٹل ایکس رے اور روٹ کینال" },
+  },
+  aadhaar: {
+    en: { label: "Govt & Civic Seva", subtitle: "Aadhaar Biometric Update, Address & Phone Change, New Enrolments" },
+    hi: { label: "सरकारी व नागरिक सेवा", subtitle: "आधार बायोमेट्रिक अपडेट, पता व नाम परिवर्तन, नया नामांकन" },
+    te: { label: "ప్రభుత్వ & పౌర సేవలు", subtitle: "ఆధార్ బయోమెట్రిక్ అప్‌డేట్, చిరునామా మార్పు, కొత్త నమోదు" },
+    ta: { label: "அரசு & மக்கள் சேவை", subtitle: "ஆதார் கைரேகை அப்டேட், முகவரி மாற்றம், புதிய பதிவு" },
+    bn: { label: "সরকারি ও নাগরিক সেবা", subtitle: "আধার বায়োমেট্রিক আপডেট, ঠিকানা পরিবর্তন, নতুন নথিভুক্তকরণ" },
+    ur: { label: "سرکاری اور شہری خدمات", subtitle: "آدھار بائیو میٹرک اپ ڈیٹ، پتہ کی تبدیلی، نئی رجسٹریشن" },
+  },
+  bank: {
+    en: { label: "Bank & Financial", subtitle: "Instant Digital KYC, Savings & Current Accounts, Forex & Vault Lockers" },
+    hi: { label: "बैंक व वित्तीय सेवाएं", subtitle: "डिजिटल केवाईसी, बचत व चालू खाता, विदेशी मुद्रा व लॉकर" },
+    te: { label: "బ్యాంకు & ఆర్థిక సేవలు", subtitle: "డిజిటల్ కేవైసీ, పొదుపు ఖాతా, ఫారెక్స్ & లాకర్ సేవలు" },
+    ta: { label: "வங்கி & நிதிச் சேவைகள்", subtitle: "டிஜிட்டல் கேஒய்சி, புதிய கணக்கு, லாக்கர் செயல்பாடுகள்" },
+    bn: { label: "ব্যাংক ও আর্থিক সেবা", subtitle: "ডিজিটাল কেওয়াইসি, সেভিংস অ্যাকাউন্ট, লকার সেবা" },
+    ur: { label: "بینک اور مالیاتی خدمات", subtitle: "ڈیجیٹل کے وائی سی، نیا اکاؤنٹ، فاریکس اور لاکر سروسز" },
+  },
+  legal: {
+    en: { label: "Legal & Notary", subtitle: "Affidavit Attestation, Stamp Verification, Property Deeds & Consultations" },
+    hi: { label: "कानूनी व नोटरी सेवाएं", subtitle: "शपथ पत्र सत्यापन, स्टांप सत्यापन, अनुबंध समीक्षा व परामर्श" },
+    te: { label: "లీగల్ & నోటరీ", subtitle: "అఫిడవిట్ ధృవీకరణ, ఒప్పంద సమీక్ష & న్యాయ సలహా" },
+    ta: { label: "சட்டம் & நோட்டரி", subtitle: "சான்றிதழ் சரிபார்ப்பு, ஒப்பந்த மதிப்பாய்வு & சட்ட ஆலோசனை" },
+    bn: { label: "আইনি ও নোটারি", subtitle: "হলফনামা সত্যায়ন, চুক্তি পর্যালোচনা ও আইনি পরামর্শ" },
+    ur: { label: "قانونی اور نوٹری", subtitle: "حلف نامہ کی تصدیق، معاہدے کا جائزہ اور قانونی مشورہ" },
+  },
+};
+
+export function getLocalizedCategories(lang = "en") {
+  const activeCode = lang || "en";
+  return serviceCategories.map((cat) => {
+    const trans = categoryTranslations[cat.id]?.[activeCode] || categoryTranslations[cat.id]?.en;
+    return {
+      ...cat,
+      label: trans?.label || cat.label,
+      subtitle: trans?.subtitle || cat.subtitle,
+    };
+  });
+}
+
 export const serviceCategories = [
   {
     id: "hospital",

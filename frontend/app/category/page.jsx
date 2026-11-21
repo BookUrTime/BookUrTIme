@@ -5,7 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useBooking } from "../../context/BookingContext";
 import { Screen, BottomNavBar } from "../../components/UI";
-import { serviceCategories } from "../../lib/dummyData";
+import { serviceCategories, categoryTranslations, languages } from "../../lib/dummyData";
+import { strings } from "../../lib/strings";
 
 function CategoryContent() {
   const router = useRouter();
@@ -17,10 +18,17 @@ function CategoryContent() {
     providerList,
     setProvider,
     setSelectedService,
+    language,
+    setLanguage,
   } = useBooking();
+
+  const activeLang = language || "en";
+  const s = strings[activeLang] || strings.en;
+  const currentLangObj = languages.find((l) => l.code === activeLang) || languages[0];
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedServiceTag, setSelectedServiceTag] = useState("all");
+  const [showLangModal, setShowLangModal] = useState(false);
 
   // Find active category
   const activeCategory = useMemo(() => {
@@ -28,6 +36,10 @@ function CategoryContent() {
       serviceCategories.find((c) => c.id === rawType) || serviceCategories[0]
     );
   }, [rawType]);
+
+  const currentCatTrans = categoryTranslations[activeCategory.id]?.[activeLang] || categoryTranslations[activeCategory.id]?.en;
+  const categoryLabel = currentCatTrans?.label || activeCategory.label;
+  const categorySubtitle = currentCatTrans?.subtitle || activeCategory.subtitle;
 
   // Find providers matching this category
   const matchingProviders = useMemo(() => {
@@ -122,11 +134,11 @@ function CategoryContent() {
             <button
               onClick={() => router.push("/")}
               className="p-2 -ml-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:scale-95 transition flex items-center gap-1.5 cursor-pointer"
-              title="Return to Home"
+              title={s.back}
             >
               <span className="material-symbols-outlined text-xl">arrow_back</span>
               <span className="hidden sm:inline text-xs font-bold uppercase tracking-wider">
-                Categories
+                {s.allCategories}
               </span>
             </button>
             <div className="h-5 w-px bg-slate-200 hidden sm:block"></div>
@@ -151,14 +163,14 @@ function CategoryContent() {
               className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
             >
               <span className="material-symbols-outlined text-lg">apps</span>
-              <span>All Categories</span>
+              <span>{s.allCategories}</span>
             </Link>
             <Link
               href="/bookings"
               className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
             >
               <span className="material-symbols-outlined text-lg">event_note</span>
-              <span>My Bookings</span>
+              <span>{s.myBookings}</span>
             </Link>
             <a
               href="https://wa.me/919876543210"
@@ -169,18 +181,28 @@ function CategoryContent() {
               <span className="material-symbols-outlined text-lg text-emerald-600">
                 support_agent
               </span>
-              <span>Support</span>
+              <span>{s.navSupport || "Support"}</span>
             </a>
           </nav>
 
           <div className="flex items-center gap-2.5">
+            {/* Quick Language Pill */}
+            <button
+              onClick={() => setShowLangModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold transition cursor-pointer border border-slate-200"
+              title={s.switchLanguage}
+            >
+              <span className="material-symbols-outlined text-base">translate</span>
+              <span>{currentLangObj.label.split(" ")[0]}</span>
+            </button>
+
             <button
               onClick={() => router.push("/business")}
               className="px-3.5 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1.5 shadow-sm"
               title="Open Business Device Portal"
             >
               <span className="material-symbols-outlined text-base text-blue-400">devices</span>
-              <span className="hidden sm:inline">Business Terminal</span>
+              <span className="hidden sm:inline">{s.businessTerminal}</span>
             </button>
           </div>
         </div>
@@ -192,12 +214,12 @@ function CategoryContent() {
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <Link href="/" className="hover:text-blue-600 flex items-center gap-1">
             <span className="material-symbols-outlined text-sm">home</span>
-            <span>Home</span>
+            <span>{s.home}</span>
           </Link>
           <span>/</span>
-          <span>Categories</span>
+          <span>{s.categoriesCount || "Categories"}</span>
           <span>/</span>
-          <span className="text-slate-900 font-bold">{activeCategory.label}</span>
+          <span className="text-slate-900 font-bold">{categoryLabel}</span>
         </div>
 
         {/* Category Header Banner */}
@@ -214,13 +236,13 @@ function CategoryContent() {
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold mb-1.5 border bg-slate-100 text-slate-700 border-slate-200">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span>{activeCategory.stats || "Live Hubs Active"}</span>
+                  <span>{activeCategory.stats || s.liveQueueOpen}</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                  {activeCategory.label}
+                  {categoryLabel}
                 </h1>
                 <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                  {activeCategory.subtitle}
+                  {categorySubtitle}
                 </p>
               </div>
             </div>
@@ -232,7 +254,7 @@ function CategoryContent() {
                   {matchingProviders.length}
                 </div>
                 <div className="text-[11px] text-slate-400 font-semibold uppercase">
-                  Verified Centers
+                  {s.verifiedCenters}
                 </div>
               </div>
               <div className="h-8 w-px bg-slate-200"></div>
@@ -241,16 +263,16 @@ function CategoryContent() {
                   {availableServices.length}
                 </div>
                 <div className="text-[11px] text-slate-400 font-semibold uppercase">
-                  Procedures
+                  {s.procedures}
                 </div>
               </div>
               <div className="h-8 w-px bg-slate-200"></div>
               <div>
                 <div className="text-xl font-black text-emerald-600">
-                  ~12m
+                  ~12 {s.min}
                 </div>
                 <div className="text-[11px] text-slate-400 font-semibold uppercase">
-                  Average Wait
+                  {s.averageWait}
                 </div>
               </div>
             </div>
@@ -259,10 +281,11 @@ function CategoryContent() {
           {/* Quick Category Switcher Tabs */}
           <div className="mt-6 pt-5 border-t border-slate-100 flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
-              Switch Category:
+              {s.switchCategory}
             </span>
             {serviceCategories.map((cat) => {
               const isSelected = cat.id === activeCategory.id;
+              const catTrans = categoryTranslations[cat.id]?.[activeLang] || categoryTranslations[cat.id]?.en;
               return (
                 <button
                   key={cat.id}
@@ -278,7 +301,7 @@ function CategoryContent() {
                   }`}
                 >
                   <span className="material-symbols-outlined text-sm">{cat.icon}</span>
-                  <span>{cat.label}</span>
+                  <span>{catTrans?.label || cat.label}</span>
                 </button>
               );
             })}
@@ -296,7 +319,7 @@ function CategoryContent() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={`Search procedures or centers in ${activeCategory.label}...`}
+                placeholder={`${s.searchInCategory || "Search in"} ${categoryLabel}...`}
                 className="w-full h-11 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl pl-10 pr-10 text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
               />
               {searchQuery && (
@@ -310,9 +333,9 @@ function CategoryContent() {
             </div>
 
             <div className="text-xs font-semibold text-slate-500 shrink-0 flex items-center gap-1">
-              <span>Showing:</span>
+              <span>{s.showingCenters || "Showing:"}</span>
               <span className="text-slate-900 font-bold">
-                {filteredData.length} Centers
+                {filteredData.length} {s.centers || "Centers"}
               </span>
             </div>
           </div>
@@ -328,7 +351,7 @@ function CategoryContent() {
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
-                All Services ({availableServices.length})
+                {s.allServices || "All Services"} ({availableServices.length})
               </button>
 
               {availableServices.map((svc) => {
@@ -381,7 +404,7 @@ function CategoryContent() {
                             {b.name}
                           </h2>
                           <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/70 px-2.5 py-0.5 rounded-full text-xs font-bold">
-                            ~{b.waitMinutes || 12}m live wait
+                            ~{b.waitMinutes || 12} {s.mins}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
@@ -391,7 +414,7 @@ function CategoryContent() {
                           <span>{b.address}</span>
                           <span>•</span>
                           <span className="font-semibold text-slate-600">
-                            {b.distanceKm} km away
+                            {b.distanceKm} {s.kmAway || "km away"}
                           </span>
                         </p>
                       </div>
@@ -402,8 +425,8 @@ function CategoryContent() {
                         onClick={() => handleBookProvider(b)}
                         className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer flex items-center gap-1.5 shadow-sm"
                       >
-                        <span>General Booking</span>
-                        <span className="material-symbols-outlined text-sm">
+                        <span>{s.generalBooking || "General Booking"}</span>
+                        <span className="material-symbols-outlined text-sm rtl:rotate-180">
                           arrow_forward
                         </span>
                       </button>
@@ -417,10 +440,10 @@ function CategoryContent() {
                         <span className="material-symbols-outlined text-sm text-blue-600">
                           checklist
                         </span>
-                        <span>Available Services &amp; Procedures ({servicesToDisplay.length})</span>
+                        <span>{s.availableProcedures || "Available Services & Procedures"} ({servicesToDisplay.length})</span>
                       </h3>
                       <span className="text-xs text-slate-400">
-                        Choose a service to reserve your exact time slot
+                        {s.chooseProcedureSubtitle || "Choose a service to reserve your exact time slot"}
                       </span>
                     </div>
 
@@ -437,7 +460,7 @@ function CategoryContent() {
                               </h4>
                               <div className="text-right shrink-0">
                                 <span className="text-xs font-extrabold text-blue-700 bg-blue-100/70 border border-blue-200 px-2 py-0.5 rounded-md inline-block">
-                                  {svc.price === 0 ? "Free" : `₹${svc.price}`}
+                                  {svc.price === 0 ? (s.freePrice || "Free") : `₹${svc.price}`}
                                 </span>
                               </div>
                             </div>
@@ -452,14 +475,14 @@ function CategoryContent() {
                               <span className="material-symbols-outlined text-xs text-slate-400">
                                 schedule
                               </span>
-                              <span>{svc.durationMinutes} mins</span>
+                              <span>{svc.durationMinutes} {s.mins}</span>
                             </span>
 
                             <button
                               onClick={() => handleBookService(b, svc)}
                               className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1"
                             >
-                              <span>Book Slot</span>
+                              <span>{s.bookSlotBtn || "Book Slot"}</span>
                               <span className="material-symbols-outlined text-xs rtl:rotate-180">
                                 arrow_forward
                               </span>
@@ -478,7 +501,7 @@ function CategoryContent() {
                 search_off
               </span>
               <p className="font-bold text-lg text-slate-800">
-                No services or centers found
+                {s.noResultsFound || "No services or centers found"}
               </p>
               <p className="text-xs text-slate-500 mt-1 max-w-sm">
                 No services match your active search filter. Try clearing your search keyword or switching service filters.
@@ -490,12 +513,65 @@ function CategoryContent() {
                 }}
                 className="mt-4 px-5 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-500 transition cursor-pointer"
               >
-                Reset Filters
+                {s.resetFilters || "Reset Filters"}
               </button>
             </div>
           )}
         </section>
       </main>
+
+      {/* LANGUAGE SELECTION MODAL */}
+      {showLangModal && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-600">translate</span>
+                <h3 className="font-bold text-slate-900 text-base">{s.selectLanguageModal}</h3>
+              </div>
+              <button
+                onClick={() => setShowLangModal(false)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              {languages.map((l) => {
+                const isSelected = activeLang === l.code;
+                return (
+                  <button
+                    key={l.code}
+                    onClick={() => {
+                      setLanguage(l.code);
+                      setShowLangModal(false);
+                    }}
+                    className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? "bg-blue-50 border-blue-500 text-blue-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-sm text-slate-700 shadow-2xs">
+                        {l.avatar}
+                      </span>
+                      <div>
+                        <div className="font-bold text-sm">{l.label}</div>
+                        <div className="text-[11px] text-slate-500">{l.subtitle}</div>
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <span className="material-symbols-outlined text-blue-600">check_circle</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNavBar />
     </Screen>

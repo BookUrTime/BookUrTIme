@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../context/BookingContext";
 import { Screen, BottomNavBar } from "../components/UI";
-import { languages, serviceCategories } from "../lib/dummyData";
+import { languages, getLocalizedCategories } from "../lib/dummyData";
 import { formatDate } from "../lib/formatDate";
+import { strings } from "../lib/strings";
 
 export default function Home() {
   const router = useRouter();
@@ -20,6 +21,10 @@ export default function Home() {
     language,
     setLanguage,
   } = useBooking();
+
+  const activeLang = language || "en";
+  const s = strings[activeLang] || strings.en;
+  const localizedCategories = useMemo(() => getLocalizedCategories(activeLang), [activeLang]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [showLangModal, setShowLangModal] = useState(false);
@@ -135,14 +140,14 @@ export default function Home() {
               className="text-blue-600 font-bold flex items-center gap-1.5 hover:text-blue-700 transition"
             >
               <span className="material-symbols-outlined text-lg">explore</span>
-              <span>Explore Businesses</span>
+              <span>{s.exploreBusinesses}</span>
             </Link>
             <Link
               href="/bookings"
               className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
             >
               <span className="material-symbols-outlined text-lg">event_note</span>
-              <span>My Bookings</span>
+              <span>{s.myBookings}</span>
             </Link>
             <a
               href="https://wa.me/919876543210"
@@ -151,7 +156,7 @@ export default function Home() {
               className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
             >
               <span className="material-symbols-outlined text-lg text-emerald-600">support_agent</span>
-              <span>Support</span>
+              <span>{s.navSupport || "Support"}</span>
             </a>
           </nav>
 
@@ -161,7 +166,7 @@ export default function Home() {
             <button
               onClick={() => setShowLangModal(true)}
               className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold transition cursor-pointer border border-slate-200"
-              title="Switch Language"
+              title={s.switchLanguage}
             >
               <span className="material-symbols-outlined text-base">translate</span>
               <span>{currentLangObj.label.split(" ")[0]}</span>
@@ -174,7 +179,7 @@ export default function Home() {
               title="Open Business Device Portal"
             >
               <span className="material-symbols-outlined text-base text-blue-400">devices</span>
-              <span className="hidden sm:inline">Business Terminal</span>
+              <span className="hidden sm:inline">{s.businessTerminal}</span>
             </button>
           </div>
         </div>
@@ -190,7 +195,7 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-white/20 shrink-0">
                 <span className="text-[10px] uppercase font-bold text-blue-200 tracking-widest leading-none">
-                  TOKEN
+                  {s.tokenLabel || "TOKEN"}
                 </span>
                 <span className="font-mono font-extrabold text-lg leading-tight mt-0.5">
                   {activeBooking.token}
@@ -202,7 +207,7 @@ export default function Home() {
                     ● {activeBooking.status || "Active"}
                   </span>
                   <span className="text-xs text-blue-200 font-medium">
-                    Slot: {activeBooking.slot}
+                    {s.timeSlotLabel || "Slot:"} {activeBooking.slot}
                   </span>
                 </div>
                 <h4 className="font-bold text-base text-white mt-1 leading-snug">
@@ -215,7 +220,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 px-4 py-2.5 rounded-xl shrink-0 self-start sm:self-auto transition">
-              <span>View Live Ticket</span>
+              <span>{s.viewLiveTicket}</span>
               <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
             </div>
           </div>
@@ -227,28 +232,28 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-2 border border-blue-100">
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                <span>Live Wait Time &amp; Online Slot Reservation</span>
+                <span>{s.heroBadge}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
-                Book Your Slot. Skip The Wait.
+                {s.heroTitle}
               </h1>
               <p className="text-slate-500 text-sm mt-1 max-w-xl">
-                Search verified clinics, salons, banks, dentists, and service hubs. Reserve exact time slots and monitor live token queues in real-time.
+                {s.heroSubtitle}
               </p>
             </div>
 
             <div className="hidden lg:flex items-center gap-6 text-xs text-slate-500 font-semibold border-l border-slate-200 pl-6 shrink-0">
               <div className="text-center">
                 <div className="text-lg font-black text-slate-900">0</div>
-                <div>Queue Waiting</div>
+                <div>{s.waitLabel || "Queue Waiting"}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-black text-blue-600">100%</div>
-                <div>Free to Book</div>
+                <div>{s.freePrice || "Free to Book"}</div>
               </div>
               <div className="text-center">
                 <div className="text-lg font-black text-emerald-600">Live</div>
-                <div>Queue Counter</div>
+                <div>{s.liveQueueOpen}</div>
               </div>
             </div>
           </div>
@@ -262,7 +267,7 @@ export default function Home() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by business name, specialty, or service (e.g. CityCare, Hair Cut, Teeth Cleaning)..."
+              placeholder={s.searchPlaceholder}
               className="w-full h-14 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-2xl pl-12 pr-12 text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition shadow-inner"
             />
             {searchQuery && (
@@ -282,9 +287,9 @@ export default function Home() {
             <div className="flex items-center justify-between px-1">
               <div>
                 <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                  <span>Search Results for &quot;{searchQuery}&quot;</span>
+                  <span>{s.searchResultsFor} &quot;{searchQuery}&quot;</span>
                   <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">
-                    {filteredBusinesses.length} found
+                    {filteredBusinesses.length} {s.found}
                   </span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -297,7 +302,7 @@ export default function Home() {
                 className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
               >
                 <span className="material-symbols-outlined text-sm">close</span>
-                <span>Clear Search</span>
+                <span>{s.clearSearch}</span>
               </button>
             </div>
 
@@ -331,13 +336,13 @@ export default function Home() {
                                   {b.type}
                                 </span>
                                 <span>•</span>
-                                <span>{b.distanceKm} km away</span>
+                                <span>{b.distanceKm} {s.kmAway || "km away"}</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="bg-emerald-50 text-emerald-700 border border-emerald-200/70 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0">
-                            ~{b.waitMinutes || 12}m wait
+                            ~{b.waitMinutes || 12} {s.mins}
                           </div>
                         </div>
 
@@ -367,9 +372,9 @@ export default function Home() {
                       {/* Footer */}
                       <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                         <div className="text-xs text-slate-500">
-                          <span className="font-semibold text-slate-700">Taking bookings</span>
+                          <span className="font-semibold text-slate-700">{s.takingBookings}</span>
                           <div className="text-[11px] text-slate-400">
-                            Slots: {(b.slots || []).length} daily
+                            {s.slotsDaily}: {(b.slots || []).length}
                           </div>
                         </div>
 
@@ -377,7 +382,7 @@ export default function Home() {
                           onClick={() => handleBookBusiness(b)}
                           className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
                         >
-                          <span>Book Slot</span>
+                          <span>{s.bookSlotBtn}</span>
                           <span className="material-symbols-outlined text-sm rtl:rotate-180">
                             arrow_forward
                           </span>
@@ -393,16 +398,16 @@ export default function Home() {
                   search_off
                 </span>
                 <p className="font-bold text-base text-slate-700">
-                  No businesses or services match &quot;{searchQuery}&quot;
+                  {s.noResultsFound}
                 </p>
                 <p className="text-xs text-slate-400 mt-1">
-                  Try searching with generic terms like &quot;doctor&quot;, &quot;facial&quot;, &quot;aadhaar&quot;, or &quot;dental&quot;.
+                  Try searching with generic terms like doctor, facial, aadhaar, or dental.
                 </p>
                 <button
                   onClick={() => setSearchQuery("")}
                   className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition cursor-pointer"
                 >
-                  View All Categories
+                  {s.viewAllCategories}
                 </button>
               </div>
             )}
@@ -413,23 +418,23 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
               <div>
                 <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                  <span>Browse by Business Category</span>
+                  <span>{s.browseCategoryTitle}</span>
                   <span className="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
-                    {serviceCategories.length} Categories
+                    {localizedCategories.length} {s.categoriesCount}
                   </span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Click on any category to view available centers, procedures menu, and instant time slots.
+                  {s.browseCategorySubtitle}
                 </p>
               </div>
               <span className="text-xs text-slate-400 font-medium hidden sm:block">
-                Updated today • {formatDate()}
+                {formatDate()}
               </span>
             </div>
 
             {/* Small Category Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {serviceCategories.map((cat) => {
+              {localizedCategories.map((cat) => {
                 const count = (providerList || []).filter((p) => {
                   if (cat.id === "hospital") return p.type === "hospital" || p.type === "clinic";
                   return p.type === cat.id;
@@ -453,7 +458,7 @@ export default function Home() {
                         </div>
 
                         <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200/70 group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-200 transition">
-                          {count} {count === 1 ? "Center" : "Centers"}
+                          {count} {count === 1 ? s.center : s.centers}
                         </span>
                       </div>
 
@@ -484,12 +489,12 @@ export default function Home() {
                     <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-blue-600 transition">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span className="text-slate-500 font-semibold">{cat.stats || "Live Queue Open"}</span>
+                        <span className="text-slate-500 font-semibold">{s.liveQueueOpen}</span>
                       </span>
 
                       <div className="flex items-center gap-1 text-blue-600 group-hover:translate-x-1 transition-transform">
-                        <span>View Services</span>
-                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                        <span>{s.viewServices}</span>
+                        <span className="material-symbols-outlined text-base rtl:rotate-180">arrow_forward</span>
                       </div>
                     </div>
                   </div>
@@ -501,10 +506,10 @@ export default function Home() {
             <div className="mt-4 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md">
               <div className="max-w-xl">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
-                  How BookUrTime Works
+                  {s.howItWorks}
                 </span>
                 <h3 className="text-xl sm:text-2xl font-black mt-1">
-                  Skip the physical lines in 3 simple steps
+                  {s.howItWorksSubtitle}
                 </h3>
               </div>
 
@@ -514,9 +519,9 @@ export default function Home() {
                     1
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-white">Choose Category &amp; Center</h4>
+                    <h4 className="font-bold text-sm text-white">{s.step1Title}</h4>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Select your service type: clinic OPD, salon grooming, dental checkup, or govt seva.
+                      {s.step1Desc}
                     </p>
                   </div>
                 </div>
@@ -526,9 +531,9 @@ export default function Home() {
                     2
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-white">Select Exact Time Slot</h4>
+                    <h4 className="font-bold text-sm text-white">{s.step2Title}</h4>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Reserve a dedicated appointment slot and avoid waiting in crowded waiting lobbies.
+                      {s.step2Desc}
                     </p>
                   </div>
                 </div>
@@ -538,9 +543,9 @@ export default function Home() {
                     3
                   </div>
                   <div>
-                    <h4 className="font-bold text-sm text-white">Live Digital Token</h4>
+                    <h4 className="font-bold text-sm text-white">{s.step3Title}</h4>
                     <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-                      Receive an instant live queue pass with real-time counter updates on WhatsApp and web.
+                      {s.step3Desc}
                     </p>
                   </div>
                 </div>
@@ -557,7 +562,7 @@ export default function Home() {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-blue-600">translate</span>
-                <h3 className="font-bold text-slate-900 text-base">Select Your Language</h3>
+                <h3 className="font-bold text-slate-900 text-base">{s.selectLanguageModal}</h3>
               </div>
               <button
                 onClick={() => setShowLangModal(false)}
