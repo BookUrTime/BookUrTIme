@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { providers } from "../lib/dummyData";
 import {
   cancelBooking,
@@ -195,7 +195,7 @@ export function BookingProvider({ children }) {
     return () => clearTimeout(timer);
   }, []);
 
-  const loadProviders = async (type = serviceType) => {
+  const loadProviders = useCallback(async (type = serviceType) => {
     if (!useBackend) return providerList;
     setProvidersLoading(true);
     try {
@@ -208,9 +208,9 @@ export function BookingProvider({ children }) {
     } finally {
       setProvidersLoading(false);
     }
-  };
+  }, [providerList, serviceType]);
 
-  const loadSlots = async (providerId) => {
+  const loadSlots = useCallback(async (providerId) => {
     if (!providerId || !useBackend) return null;
     setSlotsLoading(true);
     try {
@@ -229,21 +229,21 @@ export function BookingProvider({ children }) {
     } finally {
       setSlotsLoading(false);
     }
-  };
+  }, [provider?.id, providerList]);
 
   useEffect(() => {
     if (isHydrated && serviceType) {
       const timer = setTimeout(() => loadProviders(serviceType).catch(() => {}), 0);
       return () => clearTimeout(timer);
     }
-  }, [isHydrated, serviceType]);
+  }, [isHydrated, serviceType, loadProviders]);
 
   useEffect(() => {
     if (isHydrated && provider?.id) {
       const timer = setTimeout(() => loadSlots(provider.id).catch(() => {}), 0);
       return () => clearTimeout(timer);
     }
-  }, [isHydrated, provider?.id]);
+  }, [isHydrated, provider?.id, loadSlots]);
 
   // Sync HTML dir attribute for RTL support (Urdu)
   useEffect(() => {

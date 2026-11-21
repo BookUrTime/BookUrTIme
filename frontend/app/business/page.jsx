@@ -83,7 +83,7 @@ export default function BusinessDevicePage() {
   };
 
   // Poll live queue & metrics
-  const refreshQueueData = async () => {
+  const refreshQueueData = useCallback(async () => {
     if (!selectedBusinessId) return;
     try {
       const [queueData, metricsData] = await Promise.all([
@@ -97,7 +97,7 @@ export default function BusinessDevicePage() {
       setLiveQueue(null);
       setMetrics(null);
     }
-  };
+  }, [selectedBusinessId]);
 
   useEffect(() => {
     if (!isHydrated || !selectedBusinessId) return;
@@ -109,7 +109,7 @@ export default function BusinessDevicePage() {
       clearTimeout(timer);
       clearInterval(interval);
     };
-  }, [isHydrated, selectedBusinessId]);
+  }, [isHydrated, selectedBusinessId, refreshQueueData]);
 
   // Call Next Token Action
   const handleCallNext = async () => {

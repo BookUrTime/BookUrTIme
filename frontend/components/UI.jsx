@@ -14,7 +14,7 @@ export function Button({ children, className = "", ...props }) {
 export function Screen({ children, className = "" }) {
   const { language } = useBooking();
   const isRtl = language === "ur";
-  return <main dir={isRtl ? "rtl" : "ltr"} className={`min-h-screen bg-background p-0 ${className}`}>{children}</main>;
+  return <div dir={isRtl ? "rtl" : "ltr"} className={`min-h-screen bg-background p-0 ${className}`}>{children}</div>;
 }
 
 export function BottomNavBar() {
