@@ -155,22 +155,26 @@ export default function SlotsPage() {
   };
 
   return (
-    <Screen className="flex flex-col min-h-screen bg-background relative overflow-x-hidden p-0 max-w-container-max mx-auto">
+    <Screen className="flex flex-col min-h-screen bg-slate-50 relative overflow-x-hidden p-0 w-full">
       {/* Top App Bar Header */}
-      <header className="bg-surface sticky top-0 w-full max-w-container-max mx-auto h-16 z-50 flex items-center justify-between px-page-margin border-b border-outline-variant/10 shrink-0">
-        <button
-          onClick={handleBack}
-          className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center gap-1 p-2 min-touch-target cursor-pointer shrink-0"
-        >
-          <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
-          <span className="font-label-lg text-label-lg font-semibold">{s.back}</span>
-        </button>
-        <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
-        <div className="w-12"></div>
+      <header className="bg-white/95 backdrop-blur-md sticky top-0 w-full border-b border-slate-200/80 z-50">
+        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <button
+            onClick={handleBack}
+            className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center gap-1.5 p-2 rounded-xl hover:bg-slate-100 cursor-pointer shrink-0"
+          >
+            <span className="material-symbols-outlined rtl:rotate-180 text-xl">arrow_back</span>
+            <span className="font-semibold text-sm">{s.back}</span>
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-slate-900 tracking-tight text-lg">BookUrTime</span>
+          </div>
+          <div className="w-16"></div>
+        </div>
       </header>
 
       {/* Main Container */}
-      <main className="flex-grow px-page-margin pt-6 pb-32 flex flex-col gap-6">
+      <main className="flex-grow max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-36 flex flex-col gap-6">
         {/* Provider Info Header Card */}
         <section className="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant shadow-sm shrink-0">
           <div className="flex items-center gap-4 mb-2">
@@ -366,26 +370,32 @@ export default function SlotsPage() {
       </main>
 
       {/* Sticky Bottom Confirm Booking Button */}
-      <footer className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto bg-surface-container-lowest/90 backdrop-blur-md px-page-margin py-4 border-t border-outline-variant/30 flex flex-col gap-2 z-[60]">
-        <button
-          onClick={handleConfirmBooking}
-          disabled={!isFormValid || isProcessing}
-          className={`w-full h-[52px] bg-primary text-on-primary rounded-xl font-label-lg flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer shrink-0 ${
-            !isFormValid || isProcessing ? "opacity-50 cursor-not-allowed" : "hover:bg-opacity-95"
-          }`}
-        >
-          {isProcessing ? (
-            <>
-              <span className="material-symbols-outlined animate-spin">sync</span>
-              <span>{s.processing}</span>
-            </>
-          ) : (
-            <>
-              <span className="material-symbols-outlined">check_circle</span>
-              <span>{s.confirmBooking}</span>
-            </>
-          )}
-        </button>
+      <footer className="fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md px-4 sm:px-6 py-4 border-t border-slate-200 flex justify-center z-[60] shadow-lg">
+        <div className="max-w-4xl w-full flex items-center justify-between gap-4">
+          <div className="hidden sm:flex flex-col text-xs text-slate-500">
+            <span className="font-semibold text-slate-800">{currentProvider.name}</span>
+            <span>{selectedSlot ? `Selected Slot: ${selectedSlot} (${selectedSlotPeriod})` : "Please choose your preferred time slot"}</span>
+          </div>
+          <button
+            onClick={handleConfirmBooking}
+            disabled={!isFormValid || isProcessing}
+            className={`w-full sm:w-auto sm:min-w-[260px] h-[52px] px-8 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 transition-all active:scale-95 cursor-pointer shrink-0 ${
+              !isFormValid || isProcessing ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isProcessing ? (
+              <>
+                <span className="material-symbols-outlined animate-spin text-lg">sync</span>
+                <span>{s.processing}</span>
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-outlined text-lg">check_circle</span>
+                <span>{s.confirmBooking}</span>
+              </>
+            )}
+          </button>
+        </div>
       </footer>
     </Screen>
   );

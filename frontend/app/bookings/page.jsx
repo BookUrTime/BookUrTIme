@@ -65,33 +65,37 @@ export default function BookingsPage() {
   };
 
   return (
-    <Screen className="flex flex-col min-h-screen bg-background relative overflow-x-hidden p-0 max-w-container-max mx-auto">
+    <Screen className="flex flex-col min-h-screen bg-slate-50 relative overflow-x-hidden p-0 w-full">
       {/* Top App Bar Header */}
-      <header className="bg-surface sticky top-0 w-full max-w-container-max mx-auto h-16 z-50 flex items-center justify-between px-page-margin border-b border-outline-variant/10 shrink-0">
-        <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
-        <button
-          onClick={handleStartBooking}
-          className="text-primary hover:opacity-85 active:scale-95 transition-all min-touch-target flex items-center justify-center p-2 cursor-pointer font-semibold text-sm gap-1"
-        >
-          <span className="material-symbols-outlined text-lg font-bold">add_circle</span>
-          {s.bookNew}
-        </button>
+      <header className="bg-white/95 backdrop-blur-md sticky top-0 w-full border-b border-slate-200/80 z-50">
+        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2">
+            <span className="font-extrabold text-slate-900 tracking-tight text-xl">{s.brandName}</span>
+          </div>
+          <button
+            onClick={handleStartBooking}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl active:scale-95 transition-all font-semibold text-xs flex items-center gap-1.5 shadow-sm shadow-blue-600/20 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-base font-bold">add_circle</span>
+            <span>{s.bookNew}</span>
+          </button>
+        </div>
       </header>
 
       {/* Main Content Dashboard */}
-      <main className="flex-grow px-page-margin pb-32 pt-6">
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-32 pt-6">
         {/* Headings */}
-        <div className="mb-stack-lg">
-          <h2 className="font-headline-lg text-headline-lg text-on-background mb-stack-sm">
+        <div className="mb-6">
+          <h2 className="text-2xl font-black text-slate-900 tracking-tight mb-1">
             {s.myBookings}
           </h2>
-          <p className="font-body-md text-on-surface-variant">
+          <p className="text-sm text-slate-500">
             {s.bookingsDesc}
           </p>
         </div>
 
         {/* Dynamic Appointments List */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {bookings && bookings.length > 0 ? (
             bookings.map((booking) => {
               const icon = serviceIcons[booking.providerType] || "local_hospital";

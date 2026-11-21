@@ -41,7 +41,6 @@ export default function BusinessDevicePage() {
   const [walkinName, setWalkinName] = useState("");
   const [walkinPhone, setWalkinPhone] = useState("");
   const [walkinService, setWalkinService] = useState("");
-  const [walkinSlot, setWalkinSlot] = useState("");
   const [walkinNotes, setWalkinNotes] = useState("");
   const [walkinSuccessToken, setWalkinSuccessToken] = useState("");
 
@@ -134,7 +133,7 @@ export default function BusinessDevicePage() {
 
     try {
       const result = await providerCreateAppointment(selectedBusinessId, {
-        slotTime: walkinSlot || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        slotTime: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
         guestName: walkinName,
         guestPhone: walkinPhone,
         serviceName: walkinService || "General Counter Service",

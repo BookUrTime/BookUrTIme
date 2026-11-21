@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useBooking } from "../context/BookingContext";
 import { Screen, BottomNavBar } from "../components/UI";
@@ -113,58 +114,89 @@ export default function Home() {
 
   return (
     <Screen className="flex flex-col min-h-screen bg-slate-50 relative pb-28">
-      {/* Top App Header */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 h-16 flex items-center justify-between max-w-container-max mx-auto w-full">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
-            <span className="material-symbols-outlined text-xl">schedule</span>
+      {/* Top App Header - Modern Responsive Web Navigation */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/90 w-full shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+          {/* Brand Logo & Title */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-xl shadow-sm">
+              <span className="material-symbols-outlined text-2xl">schedule</span>
+            </div>
+            <div>
+              <span className="font-extrabold text-slate-900 tracking-tight text-xl leading-none block">
+                BookUrTime
+              </span>
+              <span className="text-[11px] text-slate-500 font-semibold tracking-wide">
+                SMART QUEUE &amp; SLOTS
+              </span>
+            </div>
           </div>
-          <div>
-            <span className="font-extrabold text-slate-900 tracking-tight text-lg leading-none block">
-              BookUrTime
-            </span>
-            <span className="text-[10px] text-slate-500 font-semibold tracking-wide">
-              SMART QUEUE & SLOTS
-            </span>
+
+          {/* Center: Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+            <Link
+              href="/"
+              className="text-blue-600 font-bold flex items-center gap-1.5 hover:text-blue-700 transition"
+            >
+              <span className="material-symbols-outlined text-lg">explore</span>
+              <span>Explore Businesses</span>
+            </Link>
+            <Link
+              href="/bookings"
+              className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
+            >
+              <span className="material-symbols-outlined text-lg">event_note</span>
+              <span>My Bookings</span>
+            </Link>
+            <a
+              href="https://wa.me/919876543210"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-slate-600 hover:text-slate-900 flex items-center gap-1.5 transition"
+            >
+              <span className="material-symbols-outlined text-lg text-emerald-600">support_agent</span>
+              <span>Support</span>
+            </a>
+          </nav>
+
+          {/* Right: Actions */}
+          <div className="flex items-center gap-3">
+            {/* Quick Language Pill */}
+            <button
+              onClick={() => setShowLangModal(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold transition cursor-pointer border border-slate-200"
+              title="Switch Language"
+            >
+              <span className="material-symbols-outlined text-base">translate</span>
+              <span>{currentLangObj.label.split(" ")[0]}</span>
+            </button>
+
+            {/* Business Terminal Link */}
+            <button
+              onClick={() => router.push("/business")}
+              className="px-4 py-2 rounded-full bg-slate-900 hover:bg-slate-800 text-white active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+              title="Open Business Device Portal"
+            >
+              <span className="material-symbols-outlined text-base text-blue-400">devices</span>
+              <span className="hidden sm:inline">Business Terminal</span>
+            </button>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Quick Language Pill */}
-          <button
-            onClick={() => setShowLangModal(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold transition cursor-pointer border border-slate-200"
-            title="Switch Language"
-          >
-            <span className="material-symbols-outlined text-sm">translate</span>
-            <span>{currentLangObj.label.split(" ")[0]}</span>
-          </button>
-
-          {/* Business Terminal Link */}
-          <button
-            onClick={() => router.push("/business")}
-            className="px-3 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1 shadow-sm"
-            title="Open Business Device Portal"
-          >
-            <span className="material-symbols-outlined text-sm text-blue-400">devices</span>
-            <span className="hidden sm:inline">Business Terminal</span>
-          </button>
         </div>
       </header>
 
-      <main className="flex-1 max-w-container-max mx-auto w-full px-4 pt-4 flex flex-col gap-5">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-20 flex flex-col gap-6">
         {/* ACTIVE APPOINTMENT FLOATING CARD */}
         {activeBooking && activeBooking.status !== "cancelled" && (
           <div
             onClick={() => router.push("/confirmation")}
-            className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 rounded-2xl p-4 text-white shadow-lg shadow-blue-700/20 cursor-pointer hover:opacity-95 transition flex items-center justify-between select-none animate-fade-in"
+            className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 rounded-2xl p-5 text-white shadow-lg shadow-blue-700/20 cursor-pointer hover:opacity-95 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4 select-none animate-fade-in"
           >
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-white/20 shrink-0">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-xl bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-white/20 shrink-0">
                 <span className="text-[10px] uppercase font-bold text-blue-200 tracking-widest leading-none">
                   TOKEN
                 </span>
-                <span className="font-mono font-extrabold text-base leading-tight mt-0.5">
+                <span className="font-mono font-extrabold text-lg leading-tight mt-0.5">
                   {activeBooking.token}
                 </span>
               </div>
@@ -177,70 +209,91 @@ export default function Home() {
                     Slot: {activeBooking.slot}
                   </span>
                 </div>
-                <h4 className="font-bold text-sm text-white mt-1 leading-tight line-clamp-1">
+                <h4 className="font-bold text-base text-white mt-1 leading-snug">
                   {activeBooking.providerName}
                 </h4>
-                <p className="text-[11px] text-blue-200 mt-0.5 line-clamp-1">
+                <p className="text-xs text-blue-200 mt-0.5">
                   {activeBooking.serviceName || "Scheduled Service"}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-1 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl shrink-0 ml-2 transition">
-              <span>View Ticket</span>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 px-4 py-2.5 rounded-xl shrink-0 self-start sm:self-auto transition">
+              <span>View Live Ticket</span>
               <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
             </div>
           </div>
         )}
 
         {/* HERO SEARCH & DISCOVERY BAR */}
-        <section className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col gap-4">
-          <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
-              Book Your Slot. Skip The Wait.
-            </h1>
-            <p className="text-slate-500 text-xs mt-1">
-              Search any business, reserve your procedure, and track your live queue.
-            </p>
+        <section className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col gap-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mb-2 border border-blue-100">
+                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <span>Live Wait Time &amp; Online Slot Reservation</span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+                Book Your Slot. Skip The Wait.
+              </h1>
+              <p className="text-slate-500 text-sm mt-1 max-w-xl">
+                Search verified clinics, salons, banks, dentists, and service hubs. Reserve exact time slots and monitor live token queues in real-time.
+              </p>
+            </div>
+
+            <div className="hidden lg:flex items-center gap-6 text-xs text-slate-500 font-semibold border-l border-slate-200 pl-6 shrink-0">
+              <div className="text-center">
+                <div className="text-lg font-black text-slate-900">0</div>
+                <div>Queue Waiting</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-black text-blue-600">100%</div>
+                <div>Free to Book</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-black text-emerald-600">Live</div>
+                <div>Queue Counter</div>
+              </div>
+            </div>
           </div>
 
           {/* Search Input Box */}
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xl pointer-events-none">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-2xl pointer-events-none">
               search
             </span>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search clinic, salon, dentist, bank, or service..."
-              className="w-full h-13 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl pl-11 pr-10 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+              placeholder="Search by business name, specialty, or service (e.g. CityCare, Hair Cut, Teeth Cleaning)..."
+              className="w-full h-14 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-2xl pl-12 pr-12 text-base font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition shadow-inner"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
               >
-                <span className="material-symbols-outlined text-lg">close</span>
+                <span className="material-symbols-outlined text-xl">close</span>
               </button>
             )}
           </div>
 
           {/* Categories Pill Carousel */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none select-none">
+          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none select-none">
             {serviceCategories.map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+                  className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition cursor-pointer shrink-0 ${
                     isSelected
                       ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30 scale-95"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200/70 border border-slate-200/60"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200/80 border border-slate-200/60"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-sm">{cat.icon}</span>
+                  <span className="material-symbols-outlined text-base">{cat.icon}</span>
                   <span>{cat.label}</span>
                 </button>
               );
@@ -249,11 +302,11 @@ export default function Home() {
         </section>
 
         {/* BUSINESS DIRECTORY SECTION */}
-        <section className="flex flex-col gap-3">
+        <section className="flex flex-col gap-4">
           <div className="flex items-center justify-between px-1">
-            <h2 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
+            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <span>Available Businesses</span>
-              <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
+              <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full">
                 {filteredBusinesses.length}
               </span>
             </h2>
@@ -261,7 +314,7 @@ export default function Home() {
           </div>
 
           {filteredBusinesses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredBusinesses.map((b) => {
                 const icon = getCategoryIcon(b.type);
                 const badgeColor = getCategoryColor(b.type);
@@ -270,11 +323,11 @@ export default function Home() {
                 return (
                   <div
                     key={b.id}
-                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-400/80 transition-all flex flex-col justify-between group"
+                    className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-400/80 transition-all flex flex-col justify-between group"
                   >
                     <div>
                       {/* Card Header: Icon + Name + Wait Badge */}
-                      <div className="flex items-start justify-between gap-3 mb-2.5">
+                      <div className="flex items-start justify-between gap-3 mb-3">
                         <div className="flex items-center gap-3">
                           <div
                             className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}
@@ -282,7 +335,7 @@ export default function Home() {
                             <span className="material-symbols-outlined text-2xl">{icon}</span>
                           </div>
                           <div>
-                            <h3 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-1">
+                            <h3 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
                               {b.name}
                             </h3>
                             <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
@@ -301,8 +354,8 @@ export default function Home() {
                       </div>
 
                       {/* Address Link */}
-                      <p className="text-xs text-slate-500 line-clamp-1 mt-1 flex items-center gap-1">
-                        <span className="material-symbols-outlined text-sm text-slate-400 shrink-0">
+                      <p className="text-xs text-slate-500 mt-2 flex items-start gap-1 leading-relaxed">
+                        <span className="material-symbols-outlined text-base text-slate-400 shrink-0 mt-0.5">
                           location_on
                         </span>
                         <span>{b.address}</span>
@@ -310,7 +363,7 @@ export default function Home() {
 
                       {/* Services Preview Tags */}
                       {servicesList.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-1.5">
+                        <div className="mt-4 flex flex-wrap gap-1.5">
                           {servicesList.map((svc) => (
                             <span
                               key={svc.id}
@@ -324,7 +377,7 @@ export default function Home() {
                     </div>
 
                     {/* Card Footer: Book Button */}
-                    <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
                       <div className="text-xs text-slate-500">
                         <span className="font-semibold text-slate-700">Taking bookings</span>
                         <div className="text-[11px] text-slate-400">
@@ -334,7 +387,7 @@ export default function Home() {
 
                       <button
                         onClick={() => handleBookBusiness(b)}
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
                       >
                         <span>Book Slot</span>
                         <span className="material-symbols-outlined text-sm rtl:rotate-180">

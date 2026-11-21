@@ -36,7 +36,7 @@ export default function LanguagePage() {
   };
 
   return (
-    <Screen className="flex flex-col min-h-screen bg-background relative overflow-hidden p-0 max-w-container-max mx-auto">
+    <Screen className="flex flex-col min-h-screen bg-slate-50 relative overflow-hidden p-0 max-w-lg mx-auto w-full">
       {/* Animated Background Ornament */}
       <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary opacity-[0.03] rounded-full blur-3xl"></div>
       <div className="absolute top-1/2 -left-32 w-80 h-80 bg-secondary opacity-[0.03] rounded-full blur-3xl"></div>

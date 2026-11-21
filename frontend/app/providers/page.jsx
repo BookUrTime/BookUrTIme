@@ -83,25 +83,27 @@ export default function ProvidersPage() {
   }
 
   return (
-    <Screen className="flex flex-col min-h-screen bg-background relative overflow-x-hidden p-0 max-w-container-max mx-auto">
+    <Screen className="flex flex-col min-h-screen bg-slate-50 relative overflow-x-hidden p-0 w-full">
       {/* Top App Bar Header */}
-      <header className="bg-surface sticky top-0 w-full max-w-container-max mx-auto h-16 z-50 flex items-center justify-between px-page-margin border-b border-outline-variant/10 shrink-0">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleBack}
-            className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 min-touch-target cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-          >
-            <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
+      <header className="bg-white/95 backdrop-blur-md sticky top-0 w-full border-b border-slate-200/80 z-50">
+        <div className="max-w-7xl mx-auto h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleBack}
+              className="text-primary hover:opacity-80 transition-opacity active:scale-95 duration-100 flex items-center justify-center p-2 rounded-xl hover:bg-slate-100 cursor-pointer"
+            >
+              <span className="material-symbols-outlined rtl:rotate-180">arrow_back</span>
+            </button>
+            <h1 className="font-extrabold text-slate-900 tracking-tight text-xl">{s.brandName}</h1>
+          </div>
+          <button className="text-slate-500 hover:text-slate-900 transition-colors p-2 rounded-xl hover:bg-slate-100 cursor-pointer">
+            <span className="material-symbols-outlined">search</span>
           </button>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</h1>
         </div>
-        <button className="text-on-surface-variant hover:opacity-80 transition-opacity min-touch-target flex items-center justify-center cursor-pointer rounded-full focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none">
-          <span className="material-symbols-outlined">search</span>
-        </button>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-grow px-page-margin pb-32 pt-6">
+      <main className="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pb-32 pt-6">
         {/* Map Header Graphic (Clickable to Google Maps) */}
         <a
           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(sortedMatches[0]?.address || "New Delhi, Delhi, India")}`}
@@ -167,7 +169,7 @@ export default function ProvidersPage() {
         </div>
 
         {/* Dynamic Provider Cards List or Skeleton Loader */}
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {providersLoading ? (
             /* Skeleton Loading State */
             Array.from({ length: 3 }).map((_, idx) => (

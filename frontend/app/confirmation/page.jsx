@@ -194,7 +194,7 @@ export default function ConfirmationPage() {
 
   if (!provider || !slot) {
     return (
-      <div className="max-w-container-max mx-auto confirmation-canvas flex flex-col relative z-10 bg-transparent px-page-margin justify-center items-center text-center min-h-screen">
+      <div className="max-w-2xl mx-auto confirmation-canvas flex flex-col relative z-10 bg-transparent px-4 justify-center items-center text-center min-h-screen">
         <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mb-6">
           <span className="material-symbols-outlined text-[40px] text-amber-600">info</span>
         </div>
@@ -230,22 +230,24 @@ export default function ConfirmationPage() {
     <>
       <canvas ref={canvasRef} className="confetti-canvas"></canvas>
 
-      <div className="max-w-container-max mx-auto confirmation-canvas flex flex-col relative z-10 bg-transparent">
+      <div className="w-full min-h-screen bg-slate-50 flex flex-col relative z-10">
         {/* Header */}
-        <header className="flex items-center justify-between px-page-margin w-full max-w-container-max mx-auto h-16 bg-surface sticky top-0 z-50">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-headline-md">check_circle</span>
-            <span className="font-headline-md text-headline-md font-bold text-primary">{s.brandName}</span>
+        <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 w-full border-b border-slate-200/80 h-16 bg-white/95 sticky top-0 z-50">
+          <div className="max-w-4xl mx-auto w-full flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-blue-600 text-2xl">check_circle</span>
+              <span className="font-extrabold text-slate-900 tracking-tight text-lg">{s.brandName}</span>
+            </div>
+            <button
+              onClick={handleReturnHome}
+              className="hover:bg-slate-100 rounded-full active:scale-95 transition-all p-2 flex items-center justify-center cursor-pointer text-slate-500"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </button>
           </div>
-          <button
-            onClick={handleReturnHome}
-            className="hover:opacity-85 active:scale-95 transition-all p-2 flex items-center justify-center cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-on-surface-variant">close</span>
-          </button>
         </header>
 
-        <main className="flex-1 px-page-margin pt-6 pb-32 flex flex-col items-center">
+        <main className="flex-1 max-w-2xl mx-auto w-full px-4 sm:px-6 pt-6 pb-28 flex flex-col items-center">
           {/* Success Title */}
           <div className="flex flex-col items-center text-center mb-6 w-full">
             <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-3 text-emerald-600">
@@ -365,14 +367,16 @@ export default function ConfirmationPage() {
         </main>
 
         {/* Bottom Actions */}
-        <footer className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-container-max bg-surface border-t border-outline-variant p-4 flex flex-col gap-2 z-50">
-          <button
-            onClick={handleReturnHome}
-            className="w-full h-12 bg-primary text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-95 transition shadow-md cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-lg">add_circle</span>
-            {s.bookAnother}
-          </button>
+        <footer className="fixed bottom-0 left-0 right-0 w-full bg-white/95 backdrop-blur-md border-t border-slate-200 p-4 flex justify-center z-50 shadow-lg">
+          <div className="max-w-md w-full">
+            <button
+              onClick={handleReturnHome}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm rounded-xl flex items-center justify-center gap-2 active:scale-95 transition shadow-md shadow-blue-600/20 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-lg">add_circle</span>
+              {s.bookAnother}
+            </button>
+          </div>
         </footer>
       </div>
     </>
