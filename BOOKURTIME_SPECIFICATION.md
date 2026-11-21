@@ -1,85 +1,114 @@
-# ⏱️ BookUrTime: Comprehensive System Architecture & Specification
+# ⏱️ BookUrTime: B2B Multi-Tenant Platform Architecture & Specification
 
-## 1. What is BookUrTime?
-**BookUrTime** is a lightweight, mobile-first appointment booking and live queue management system. It is designed to modernize waiting rooms and counter operations for essential public and private services including **clinics/hospitals**, **Aadhaar Seva Kendras**, and **banks**.
+## 1. Executive Summary & Vision
+**BookUrTime** has evolved into a full-scale **B2B2C Queue Management & Appointment Scheduling Platform**.
 
----
-
-## 2. What Problems Does It Solve?
-1. **Unpredictable Physical Queuing:**
-   - Citizens traditionally arrive early, queue up blindly, and waste hours waiting in crowded physical spaces without knowing when they will be served.
-2. **Language & Accessibility Exclusion:**
-   - Essential services are often accessed by citizens with diverse language backgrounds. Many booking apps are English-only and difficult to navigate. BookUrTime provides **6 native Indian languages** (English, Hindi, Telugu, Tamil, Bengali, Urdu) including **Right-to-Left (RTL)** layout for Urdu.
-3. **High Operational Overhead for Providers:**
-   - Small clinics, banks, and citizen service centers cannot afford complex enterprise scheduling software. BookUrTime provides an out-of-the-box **Provider Console** allowing counter staff to call the next guest, dispatch walk-ins, and generate daily shifts with zero friction.
-4. **Network Resilience & Reliability:**
-   - Public service centers often suffer from unreliable internet. BookUrTime operates with a **dual-mode architecture**: it communicates with the FastAPI backend when connected, but falls back seamlessly to `localStorage` client persistence when offline.
+The platform is divided into two distinct, interconnected applications:
+1. **The Business Device App (`/business`)**: Built for service facilities (Clinics, Banks, Aadhaar Centers, Salons, Diagnostic Labs) to run on counter tablets, desktops, or reception devices. Counter operators appoint and configure slots, manage custom services, issue physical walk-in tickets, and call tokens in real time.
+2. **The Customer Booking App (`/` & `/service`)**: Built for citizens on their personal mobile devices to browse services offered by a business, book specific time slots, receive live queue tokens, and track their real-time position in line.
 
 ---
 
-## 3. Core Features Breakdown
-
-### 👤 Citizen / Visitor Flow
-- **Multilingual Onboarding:** Select from 6 languages with immediate localized text and RTL layout adaptation.
-- **Service Categories:** Specialized flows for Healthcare, Aadhaar/Government ID, and Banking.
-- **Provider Discovery:** View distance in kilometers and live estimated wait badges.
-- **Smart Slot Booking:** Clear Morning/Afternoon time-slot matrix with seat-locking validation.
-- **Digital Confirmation Ticket:** Instant alphanumeric queue token (e.g., `HC-4821`, `AK-9102`), celebration animation, Google Maps navigation link, and simulated WhatsApp reminder.
-- **Self-Service Queue Management:** View active tickets or cancel appointments at any time from "My Bookings".
-
-### 🏢 Provider Console (Counter Staff & Admins)
-- **Live Queue Monitor:** Filter appointments by status (`waiting`, `in-progress`, `completed`, `cancelled`) and advance tokens with one click.
-- **Walk-in Dispatcher:** Issue immediate walk-in tokens at the desk with counter assignment and internal operator notes.
-- **Shift & Interval Generator:** Automatically generate customized slot intervals (e.g. 15, 30, 45, 60 minutes) across the facility's working hours.
-- **Capacity Analytics:** Real-time capacity utilization bar showing total slots, bookings, and active waiting load.
+## 2. Problems Solved in the B2B Paradigm
+1. **Counter Chaos & Uncontrolled Crowds:**
+   - Essential service businesses lack modern queue caller hardware. BookUrTime turns any tablet or PC at the counter into an intelligent token calling station.
+2. **Service Differentiation:**
+   - Appointments are not one-size-fits-all. Businesses can define specialized services (e.g. 15-minute routine consultation vs 30-minute procedure) with unique durations and pricing.
+3. **Walk-in & Online Coexistence:**
+   - Counter staff can issue instant walk-in tokens that seamlessly integrate into the same sequential queue as online bookings.
+4. **Transparent Citizen Wait Times:**
+   - Customers don't sit in the dark: their digital ticket dynamically shows *"Now Serving: HC-1001 • You are #2 in line"*, preventing crowded waiting rooms.
 
 ---
 
-## 4. End-to-End Working Flowchart
+## 3. Application Architecture & Feature Breakdown
+
+### 🏢 1. Business Device Application (`/business`)
+- **Live Counter Station:**
+  - High-visibility **Now Serving** token monitor with counter assignment (e.g. `Doctor Room 1`, `Counter 3`).
+  - Prominent **"Call Next Token"** one-tap caller with automatic status progression (`waiting` $\to$ `in-progress` $\to$ `completed`).
+  - Queue actions for each guest: Call, Complete, Absent / No-Show, Cancel.
+  - **Walk-in Dispatcher:** Issue immediate on-the-spot tokens for in-person visitors with custom counter assignment and internal notes.
+- **Service & Offerings Builder:**
+  - Create, customize, and delete business service offerings with duration in minutes, prices, and descriptions.
+- **Shift & Slot Engine:**
+  - Configure daily working hours (e.g. 09:00 to 18:00) and slot intervals (15, 20, 30, 45, 60 minutes).
+  - One-click **"Regenerate Slots for Today"**.
+  - Interactive slot grid with one-click **Block/Unblock Slot** toggles.
+- **Facility Profile & Terminal Settings:**
+  - Edit facility name, physical address, contact phone, counter name, and buffer wait time.
+- **Real-Time Analytics:**
+  - Live capacity utilization %, total footfall, active waiting, and completed tokens.
+
+---
+
+### 👤 2. Customer Booking Application (`/` & `/slots`)
+- **Facility Discovery:** Browse facilities by category with live wait times and distance markers.
+- **Service Selection:** Choose the exact procedure/service needed from the business's custom service menu.
+- **Dynamic Slot Reservation:** Morning / Afternoon slot picker based on the business's active schedule.
+- **Live Digital Token Ticket (`/confirmation`):**
+  - Unique queue token badge (e.g. `HC-1002`).
+  - **Live Queue Position:** Dynamic indicator showing who is currently being served and how many people are ahead in line.
+  - One-click Google Maps location navigation.
+  - Add to Google Calendar.
+  - Simulated WhatsApp confirmation bubble.
+- **Multi-Language Support:**
+  - 6 Indian languages (English, Hindi, Telugu, Tamil, Bengali, Urdu with full Right-to-Left RTL layout).
+- **"My Bookings" Self-Service (`/bookings`):**
+  - Track active tickets with service names and one-tap cancellation.
+
+---
+
+## 4. End-to-End System Flowchart
 
 ```mermaid
 flowchart TD
-    subgraph Visitor["👤 Visitor Booking Journey"]
-        A["🏠 Welcome Screen (/)"] --> B["🌐 Select Language (/language)"]
-        B --> C["🏢 Select Service Type (/service)"]
-        C --> D["📍 Browse Providers (/providers)"]
-        D --> E["🕒 Select Slot & Fill Details (/slots)"]
-        E --> F["🎟️ Digital Token Confirmation (/confirmation)"]
-        F --> G["📱 Simulated WhatsApp Notification"]
-        F --> H["🗺️ Navigate with Google Maps"]
-        F --> I["📋 Track in 'My Bookings' (/bookings)"]
-    end
-
-    subgraph API["⚙️ FastAPI Backend & Database"]
-        DB[("Database<br/>SQLite / PostgreSQL")]
-        SE["Slot Reservation Engine"]
-        ME["Metrics & Analytics Engine"]
+    %% Business Side
+    subgraph Business["🏢 Business Device Terminal (/business)"]
+        B1["Counter Staff Login / Dashboard"]
+        B2["Services Configurator<br/>(Add Services, Durations & Fees)"]
+        B3["Shift Generator<br/>(Working Hours & Slot Intervals)"]
+        B4["Live Counter Station<br/>('Call Next Token', Serving Screen)"]
+        B5["Walk-in Dispatcher<br/>(Instant On-the-spot Tokens)"]
         
-        E -->|"POST /bookings"| SE
-        SE -->|"Save Booking & User"| DB
-        D -->|"GET /providers"| DB
-        E -->|"GET /providers/{id}/slots"| SE
+        B1 --> B2
+        B1 --> B3
+        B1 --> B4
+        B1 --> B5
     end
 
-    subgraph Provider["💻 Provider Operator Console (/provider/dashboard)"]
-        P1["🔐 Provider Portal"] --> P2["📋 Live Queue Table"]
-        P2 --> P3{"Operator Action"}
-        P3 -->|"Call Token"| P4["Status: In-Progress"]
-        P3 -->|"Mark Done"| P5["Status: Completed"]
-        P3 -->|"No-Show"| P6["Status: Cancelled"]
+    %% Backend Engine
+    subgraph Engine["⚙️ Multi-Tenant Backend (FastAPI + Async DB)"]
+        API_BUS["/business/* APIs<br/>(Schedule, Services, Live Queue)"]
+        API_USER["/bookings & /providers APIs<br/>(Catalog, Slot Reservation)"]
+        DB[("Database<br/>Providers, Services, Slots, Bookings")]
         
-        P1 --> P7["🚶 Walk-in Dispatcher"]
-        P1 --> P8["⚙️ Shift Generator (9 AM - 5 PM)"]
-        P1 --> P9["📊 Utilization Metrics Bar"]
-
-        P7 -->|"Create Walk-in"| SE
-        P8 -->|"Generate Slots"| SE
-        P9 -->|"GET /dashboard/metrics"| ME
-        P2 -->|"GET /dashboard/upcoming"| ME
+        B2 -->|POST /business/services| API_BUS
+        B3 -->|POST /business/schedule/generate| API_BUS
+        B4 -->|POST /business/queue/call-next| API_BUS
+        B5 -->|POST /bookings (Walk-in)| API_USER
+        
+        API_BUS --> DB
+        API_USER --> DB
     end
 
-    P4 -.->|"Status Updated"| I
-    P5 -.->|"Status Updated"| I
+    %% Customer Side
+    subgraph Customer["👤 Customer Mobile Booking App (/)"]
+        C1["Browse Facility by Category"]
+        C2["Select Service Offering"]
+        C3["Pick Available Time Slot"]
+        C4["Enter Name & Phone"]
+        C5["Digital Queue Ticket<br/>(Token, Position in Line, Google Maps)"]
+        C6["My Bookings Tracker"]
+        
+        C1 --> C2 --> C3 --> C4 --> C5 --> C6
+        C1 -->|GET /providers| API_USER
+        C3 -->|GET /providers/{id}/slots| API_USER
+        C4 -->|POST /bookings| API_USER
+    end
+
+    %% Sync
+    B4 -.->|"Live Queue Advancement"| C5
 ```
 
 ---
@@ -88,5 +117,5 @@ flowchart TD
 
 - **Frontend:** Next.js 16 (App Router), React 19, Tailwind CSS v4, Webpack compiler.
 - **Backend:** FastAPI, Python 3.12+, SQLAlchemy 2.0 (Async).
-- **Databases:** SQLite (local dev), PostgreSQL + `asyncpg` (production ready).
-- **Infrastructure:** Render Web Service blueprint (`render.yaml`).
+- **Databases:** SQLite (local development) / PostgreSQL + `asyncpg` (production ready).
+- **Architecture:** Multi-tenant B2B2C REST architecture with offline `localStorage` fallback.

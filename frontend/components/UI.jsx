@@ -19,30 +19,32 @@ export function Screen({ children, className = "" }) {
 
 export function BottomNavBar() {
   const pathname = usePathname();
-  const { language, switchRole, isProviderAccount } = useBooking();
+  const { language, switchRole } = useBooking();
   const activeLang = language || "en";
   const s = strings[activeLang];
   
   const tabs = [
     { key: "home", name: s.navHome, icon: "home", href: "/service" },
     { key: "bookings", name: s.navBookings, icon: "event_note", href: "/bookings" },
-    { key: "provider", name: isProviderAccount ? "Console" : "Provider", icon: "admin_panel_settings", href: "/provider/dashboard" },
-    { key: "support", name: s.navSupport, icon: "support_agent", href: "#" },
+    { key: "business", name: "Business App", icon: "devices", href: "/business" },
+    { key: "support", name: s.navSupport, icon: "support_agent", href: "https://wa.me/919876543210" },
   ];
   
   return (
     <nav className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto h-[72px] flex justify-around items-center px-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl z-50 border-t border-outline-variant/30 select-none">
       {tabs.map((tab) => {
-        // Tab is active if pathname matches exactly, or if Home is matched by subroutes
-        const isActive = pathname === tab.href || (tab.key === "home" && (pathname === "/service" || pathname === "/providers" || pathname === "/slots"));
-        
+        const isActive =
+          pathname === tab.href ||
+          (tab.key === "home" &&
+            (pathname === "/service" || pathname === "/providers" || pathname === "/slots"));
+
         return (
           <Link
             key={tab.key}
             href={tab.href}
             onClick={() => {
-              if (tab.key === "provider") {
-                switchRole("provider");
+              if (tab.key === "business") {
+                switchRole("business");
               } else if (tab.key === "home" || tab.key === "bookings") {
                 switchRole("guest");
               }

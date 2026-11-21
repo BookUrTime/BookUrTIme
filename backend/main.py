@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from config import settings
-from routers import providers, bookings, users, dashboard, reminders
+from routers import providers, bookings, users, dashboard, reminders, business
 from seed import seed_data
 
 logging.basicConfig(
@@ -12,7 +12,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("bookurtime")
 
-app = FastAPI(title="BookUrTime API")
+app = FastAPI(title="BookUrTime API - B2B Business & User Platform")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,6 +30,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": "Internal server error. Please try again later."},
     )
 
+app.include_router(business.router)
 app.include_router(providers.router)
 app.include_router(bookings.router)
 app.include_router(users.router)
@@ -44,5 +45,8 @@ async def on_startup():
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to BookUrTime API"}
-
+    return {
+        "message": "Welcome to BookUrTime B2B Platform API",
+        "version": "2.0.0",
+        "docs": "/docs",
+    }

@@ -23,6 +23,21 @@ class User(Base):
     bookings = relationship("Booking", back_populates="user")
 
 
+class BusinessService(Base):
+    __tablename__ = "business_services"
+    id = Column(Integer, primary_key=True, index=True)
+    provider_id = Column(String, ForeignKey("providers.id"), nullable=False)
+    name = Column(String, nullable=False)
+    duration_minutes = Column(Integer, default=30, nullable=False)
+    price = Column(Float, default=0.0, nullable=False)
+    description = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    provider = relationship("Provider", back_populates="services")
+    bookings = relationship("Booking", back_populates="service")
+
+
 class Provider(Base):
     # Provider IDs are public frontend slugs (for example, "citycare").
     __tablename__ = "providers"
@@ -30,13 +45,18 @@ class Provider(Base):
     name = Column(String, nullable=False)
     type = Column(String, nullable=False)
     address = Column(String, nullable=False)
-    distance_km = Column(Float, nullable=False)
-    wait_minutes = Column(Integer, nullable=False)
+    phone = Column(String, nullable=True, default="+91 98765 43210")
+    email = Column(String, nullable=True, default="contact@business.com")
+    distance_km = Column(Float, nullable=False, default=1.0)
+    wait_minutes = Column(Integer, nullable=False, default=15)
     working_hours_start = Column(Time, nullable=False)
     working_hours_end = Column(Time, nullable=False)
-    slot_duration_minutes = Column(Integer, nullable=False)
+    slot_duration_minutes = Column(Integer, nullable=False, default=30)
+    active_counter = Column(String, nullable=True, default="Counter 1")
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    services = relationship("BusinessService", back_populates="provider", cascade="all, delete-orphan")
     slots = relationship("Slot", back_populates="provider", cascade="all, delete-orphan")
 
 
@@ -44,11 +64,14 @@ class Slot(Base):
     __tablename__ = "slots"
     id = Column(Integer, primary_key=True, index=True)
     provider_id = Column(String, ForeignKey("providers.id"), nullable=False)
+    service_id = Column(Integer, ForeignKey("business_services.id"), nullable=True)
     date = Column(Date, nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
     is_booked = Column(Boolean, default=False, nullable=False)
+    is_blocked = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
     provider = relationship("Provider", back_populates="slots")
     bookings = relationship("Booking", back_populates="slot")
 
@@ -63,10 +86,11 @@ class Slot(Base):
 
 class Booking(Base):
     __tablename__ = "bookings"
-    # This is deliberately the random-style string ID used by BookingContext.
     id = Column(String, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     slot_id = Column(Integer, ForeignKey("slots.id"), nullable=False)
+    service_id = Column(Integer, ForeignKey("business_services.id"), nullable=True)
+    service_name = Column(String, nullable=True)
     token = Column(String, nullable=False, unique=True)
     status = Column(String, default=BookingStatusEnum.waiting.value, nullable=False)
     reason = Column(String)
@@ -74,6 +98,7 @@ class Booking(Base):
     notes = Column(String)
     created_by = Column(String)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
     user = relationship("User", back_populates="bookings")
     slot = relationship("Slot", back_populates="bookings")
-
+    service = relationship("BusinessService", back_populates="bookings")

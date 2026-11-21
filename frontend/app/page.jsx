@@ -51,12 +51,12 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => router.push("/provider/dashboard")}
-            className="px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-            title="Open Provider Console"
+            onClick={() => router.push("/business")}
+            className="px-3 py-1.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+            title="Open Business Device Portal"
           >
-            <span className="material-symbols-outlined text-sm">admin_panel_settings</span>
-            <span>Provider Console</span>
+            <span className="material-symbols-outlined text-sm text-blue-400">devices</span>
+            <span>Business Terminal</span>
           </button>
           <button
             onClick={() => router.push("/language")}

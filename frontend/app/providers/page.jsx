@@ -237,6 +237,15 @@ export default function ProvidersPage() {
                           <span className="line-clamp-1 underline">{prov.address ? prov.address.split(",")[1] || prov.address : "New Delhi"}</span>
                           <span className="material-symbols-outlined text-[12px] opacity-70">open_in_new</span>
                         </a>
+                        {prov.services && prov.services.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {prov.services.slice(0, 3).map((svc) => (
+                              <span key={svc.id} className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md font-medium border border-slate-200">
+                                {svc.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className={`px-3 py-1 rounded-full font-label-sm text-label-sm shrink-0 ${waitClass}`}>

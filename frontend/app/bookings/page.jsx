@@ -117,6 +117,11 @@ export default function BookingsPage() {
                         <p className="font-label-sm text-label-sm text-on-surface-variant mt-1">
                           {providerTypeLabels[booking.providerType]?.[activeLang] || providerTypeLabels[booking.providerType]?.en || booking.providerType}
                         </p>
+                        {booking.serviceName && (
+                          <span className="inline-block text-[11px] font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded mt-1">
+                            {booking.serviceName}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1.5 shrink-0">
