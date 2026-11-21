@@ -32,9 +32,8 @@ export default function SlotsPage() {
   const currentProvider = (providerList || []).find((p) => p.id === provider?.id) || provider;
   const services = currentProvider?.services || [];
 
-  const [activeService, setActiveService] = useState(
-    selectedService || (services.length > 0 ? services[0] : null)
-  );
+  const [overrideService, setOverrideService] = useState(null);
+  const activeService = overrideService || selectedService || (services.length > 0 ? services[0] : null);
   const [selectedSlot, setSelectedSlot] = useState(slot || "");
   const [userName, setUserName] = useState(name || "");
   const [userPhone, setUserPhone] = useState(phone || "");
@@ -213,7 +212,10 @@ export default function SlotsPage() {
                 return (
                   <button
                     key={svc.id}
-                    onClick={() => setActiveService(svc)}
+                    onClick={() => {
+                      setOverrideService(svc);
+                      setSelectedService(svc);
+                    }}
                     className={`p-4 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
                       isSelected
                         ? "bg-primary/5 border-primary shadow-sm ring-1 ring-primary"

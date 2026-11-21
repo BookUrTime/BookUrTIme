@@ -22,7 +22,6 @@ export default function Home() {
   } = useBooking();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [showLangModal, setShowLangModal] = useState(false);
 
   // Find active booking if any
@@ -35,25 +34,22 @@ export default function Home() {
     );
   }, [bookings, activeBookingId]);
 
-  // Filter and search businesses
+  // Filter businesses when searching
   const filteredBusinesses = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return [];
+
     return (providerList || []).filter((b) => {
-      const matchesCategory =
-        selectedCategory === "all" || b.type === selectedCategory;
-
-      const q = searchQuery.toLowerCase().trim();
-      if (!q) return matchesCategory;
-
       const matchesName = b.name.toLowerCase().includes(q);
       const matchesAddress = b.address.toLowerCase().includes(q);
       const matchesType = b.type.toLowerCase().includes(q);
       const matchesService = (b.services || []).some((s) =>
-        s.name.toLowerCase().includes(q)
+        s.name.toLowerCase().includes(q) || (s.description && s.description.toLowerCase().includes(q))
       );
 
-      return matchesCategory && (matchesName || matchesAddress || matchesType || matchesService);
+      return matchesName || matchesAddress || matchesType || matchesService;
     });
-  }, [providerList, selectedCategory, searchQuery]);
+  }, [providerList, searchQuery]);
 
   const handleBookBusiness = (business) => {
     setProvider(business);
@@ -278,148 +274,280 @@ export default function Home() {
               </button>
             )}
           </div>
-
-          {/* Categories Pill Carousel */}
-          <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none select-none">
-            {serviceCategories.map((cat) => {
-              const isSelected = selectedCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition cursor-pointer shrink-0 ${
-                    isSelected
-                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30 scale-95"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200/80 border border-slate-200/60"
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-base">{cat.icon}</span>
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </div>
         </section>
 
-        {/* BUSINESS DIRECTORY SECTION */}
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Available Businesses</span>
-              <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2.5 py-0.5 rounded-full">
-                {filteredBusinesses.length}
-              </span>
-            </h2>
-            <span className="text-xs text-slate-500 font-medium">{formatDate()}</span>
-          </div>
+        {/* If user is actively searching: Show matching search results */}
+        {searchQuery ? (
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center justify-between px-1">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                  <span>Search Results for &quot;{searchQuery}&quot;</span>
+                  <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">
+                    {filteredBusinesses.length} found
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Click any business or procedure to reserve your slot directly.
+                </p>
+              </div>
 
-          {filteredBusinesses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredBusinesses.map((b) => {
-                const icon = getCategoryIcon(b.type);
-                const badgeColor = getCategoryColor(b.type);
-                const servicesList = b.services || [];
+              <button
+                onClick={() => setSearchQuery("")}
+                className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-sm">close</span>
+                <span>Clear Search</span>
+              </button>
+            </div>
+
+            {filteredBusinesses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredBusinesses.map((b) => {
+                  const icon = getCategoryIcon(b.type);
+                  const badgeColor = getCategoryColor(b.type);
+                  const servicesList = b.services || [];
+
+                  return (
+                    <div
+                      key={b.id}
+                      className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-400/80 transition-all flex flex-col justify-between group"
+                    >
+                      <div>
+                        {/* Header */}
+                        <div className="flex items-start justify-between gap-3 mb-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}
+                            >
+                              <span className="material-symbols-outlined text-2xl">{icon}</span>
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
+                                {b.name}
+                              </h3>
+                              <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+                                <span className="capitalize font-semibold text-slate-600">
+                                  {b.type}
+                                </span>
+                                <span>•</span>
+                                <span>{b.distanceKm} km away</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-emerald-50 text-emerald-700 border border-emerald-200/70 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0">
+                            ~{b.waitMinutes || 12}m wait
+                          </div>
+                        </div>
+
+                        {/* Address */}
+                        <p className="text-xs text-slate-500 mt-2 flex items-start gap-1 leading-relaxed">
+                          <span className="material-symbols-outlined text-base text-slate-400 shrink-0 mt-0.5">
+                            location_on
+                          </span>
+                          <span>{b.address}</span>
+                        </p>
+
+                        {/* Services */}
+                        {servicesList.length > 0 && (
+                          <div className="mt-4 flex flex-wrap gap-1.5">
+                            {servicesList.map((svc) => (
+                              <span
+                                key={svc.id}
+                                className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200/70"
+                              >
+                                {svc.name}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Footer */}
+                      <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                        <div className="text-xs text-slate-500">
+                          <span className="font-semibold text-slate-700">Taking bookings</span>
+                          <div className="text-[11px] text-slate-400">
+                            Slots: {(b.slots || []).length} daily
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleBookBusiness(b)}
+                          className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
+                        >
+                          <span>Book Slot</span>
+                          <span className="material-symbols-outlined text-sm rtl:rotate-180">
+                            arrow_forward
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-500">
+                <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">
+                  search_off
+                </span>
+                <p className="font-bold text-base text-slate-700">
+                  No businesses or services match &quot;{searchQuery}&quot;
+                </p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Try searching with generic terms like &quot;doctor&quot;, &quot;facial&quot;, &quot;aadhaar&quot;, or &quot;dental&quot;.
+                </p>
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition cursor-pointer"
+                >
+                  View All Categories
+                </button>
+              </div>
+            )}
+          </section>
+        ) : (
+          /* DEFAULT VIEW: BEAUTIFUL SMALL CARDS FOR ALL BUSINESS CATEGORIES */
+          <section className="flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 px-1">
+              <div>
+                <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <span>Browse by Business Category</span>
+                  <span className="text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 px-2.5 py-0.5 rounded-full">
+                    {serviceCategories.length} Categories
+                  </span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Click on any category to view available centers, procedures menu, and instant time slots.
+                </p>
+              </div>
+              <span className="text-xs text-slate-400 font-medium hidden sm:block">
+                Updated today • {formatDate()}
+              </span>
+            </div>
+
+            {/* Small Category Cards Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {serviceCategories.map((cat) => {
+                const count = (providerList || []).filter((p) => {
+                  if (cat.id === "hospital") return p.type === "hospital" || p.type === "clinic";
+                  return p.type === cat.id;
+                }).length;
 
                 return (
                   <div
-                    key={b.id}
-                    className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm hover:shadow-md hover:border-blue-400/80 transition-all flex flex-col justify-between group"
+                    key={cat.id}
+                    onClick={() => router.push(`/category?type=${cat.id}`)}
+                    className="bg-white border border-slate-200/90 hover:border-blue-400 rounded-3xl p-6 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between group relative overflow-hidden"
                   >
                     <div>
-                      {/* Card Header: Icon + Name + Wait Badge */}
-                      <div className="flex items-start justify-between gap-3 mb-3">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}
-                          >
-                            <span className="material-symbols-outlined text-2xl">{icon}</span>
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
-                              {b.name}
-                            </h3>
-                            <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
-                              <span className="capitalize font-semibold text-slate-600">
-                                {b.type}
-                              </span>
-                              <span>•</span>
-                              <span>{b.distanceKm} km away</span>
-                            </div>
-                          </div>
+                      {/* Top Row: Icon + Badge */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center border shadow-xs group-hover:scale-105 transition-transform ${cat.iconColor}`}
+                        >
+                          <span className="material-symbols-outlined text-3xl">
+                            {cat.icon}
+                          </span>
                         </div>
 
-                        <div className="bg-emerald-50 text-emerald-700 border border-emerald-200/70 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0">
-                          ~{b.waitMinutes || 12}m wait
-                        </div>
+                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200/70 group-hover:bg-blue-50 group-hover:text-blue-700 group-hover:border-blue-200 transition">
+                          {count} {count === 1 ? "Center" : "Centers"}
+                        </span>
                       </div>
 
-                      {/* Address Link */}
-                      <p className="text-xs text-slate-500 mt-2 flex items-start gap-1 leading-relaxed">
-                        <span className="material-symbols-outlined text-base text-slate-400 shrink-0 mt-0.5">
-                          location_on
-                        </span>
-                        <span>{b.address}</span>
+                      {/* Title & Description */}
+                      <h3 className="font-extrabold text-lg text-slate-900 group-hover:text-blue-600 transition-colors leading-snug">
+                        {cat.label}
+                      </h3>
+                      <p className="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
+                        {cat.subtitle}
                       </p>
 
-                      {/* Services Preview Tags */}
-                      {servicesList.length > 0 && (
+                      {/* Popular Services Pills */}
+                      {cat.popularServices && cat.popularServices.length > 0 && (
                         <div className="mt-4 flex flex-wrap gap-1.5">
-                          {servicesList.map((svc) => (
+                          {cat.popularServices.map((svcName, idx) => (
                             <span
-                              key={svc.id}
-                              className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200/70"
+                              key={idx}
+                              className="text-[11px] font-semibold bg-slate-50 text-slate-600 group-hover:bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200/60"
                             >
-                              {svc.name}
+                              {svcName}
                             </span>
                           ))}
                         </div>
                       )}
                     </div>
 
-                    {/* Card Footer: Book Button */}
-                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                      <div className="text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">Taking bookings</span>
-                        <div className="text-[11px] text-slate-400">
-                          Slots: {(b.slots || []).length} daily
-                        </div>
-                      </div>
+                    {/* Bottom Action Footer */}
+                    <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-blue-600 transition">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span className="text-slate-500 font-semibold">{cat.stats || "Live Queue Open"}</span>
+                      </span>
 
-                      <button
-                        onClick={() => handleBookBusiness(b)}
-                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5"
-                      >
-                        <span>Book Slot</span>
-                        <span className="material-symbols-outlined text-sm rtl:rotate-180">
-                          arrow_forward
-                        </span>
-                      </button>
+                      <div className="flex items-center gap-1 text-blue-600 group-hover:translate-x-1 transition-transform">
+                        <span>View Services</span>
+                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                      </div>
                     </div>
                   </div>
                 );
               })}
             </div>
-          ) : (
-            <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-500">
-              <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">
-                search_off
-              </span>
-              <p className="font-bold text-base text-slate-700">No businesses match your search</p>
-              <p className="text-xs text-slate-400 mt-1">
-                Try selecting &quot;All Businesses&quot; or clear your keyword search.
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedCategory("all");
-                  setSearchQuery("");
-                }}
-                className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
-              >
-                Clear Filters
-              </button>
+
+            {/* How It Works Banner */}
+            <div className="mt-4 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md">
+              <div className="max-w-xl">
+                <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
+                  How BookUrTime Works
+                </span>
+                <h3 className="text-xl sm:text-2xl font-black mt-1">
+                  Skip the physical lines in 3 simple steps
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-6 border-t border-white/10">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center font-bold text-blue-300 text-sm shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">Choose Category &amp; Center</h4>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Select your service type: clinic OPD, salon grooming, dental checkup, or govt seva.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center font-bold text-blue-300 text-sm shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">Select Exact Time Slot</h4>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Reserve a dedicated appointment slot and avoid waiting in crowded waiting lobbies.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center font-bold text-blue-300 text-sm shrink-0">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-sm text-white">Live Digital Token</h4>
+                    <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                      Receive an instant live queue pass with real-time counter updates on WhatsApp and web.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-        </section>
+          </section>
+        )}
       </main>
 
       {/* LANGUAGE SELECTION MODAL */}
