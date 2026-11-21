@@ -107,7 +107,7 @@ export default function SlotsPage() {
     .map(convertToAMPM);
 
   const handleBack = () => {
-    router.push("/providers");
+    router.push("/");
   };
 
   const handleSlotSelect = (time12) => {

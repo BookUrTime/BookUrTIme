@@ -1,31 +1,101 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Screen } from "../components/UI";
 import { useBooking } from "../context/BookingContext";
-import { strings } from "../lib/strings";
+import { Screen, BottomNavBar } from "../components/UI";
+import { languages, serviceCategories } from "../lib/dummyData";
+import { formatDate } from "../lib/formatDate";
 
 export default function Home() {
   const router = useRouter();
-  const { isHydrated, bookings, language } = useBooking();
-  const activeLang = language || "en";
-  const s = strings[activeLang];
-  const [isNavigating, setIsNavigating] = useState(false);
+  const {
+    isHydrated,
+    providerList,
+    setProvider,
+    setServiceType,
+    bookings,
+    activeBookingId,
+    language,
+    setLanguage,
+  } = useBooking();
 
-  // Redirect if existing bookings were found after hydration completes
-  useEffect(() => {
-    if (isHydrated && bookings && bookings.length > 0) {
-      router.replace("/bookings");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showLangModal, setShowLangModal] = useState(false);
+
+  // Find active booking if any
+  const activeBooking = useMemo(() => {
+    if (!bookings || bookings.length === 0) return null;
+    return (
+      bookings.find((b) => b.id === activeBookingId && b.status !== "cancelled") ||
+      bookings.find((b) => b.status === "waiting" || b.status === "in-progress") ||
+      bookings[0]
+    );
+  }, [bookings, activeBookingId]);
+
+  // Filter and search businesses
+  const filteredBusinesses = useMemo(() => {
+    return (providerList || []).filter((b) => {
+      const matchesCategory =
+        selectedCategory === "all" || b.type === selectedCategory;
+
+      const q = searchQuery.toLowerCase().trim();
+      if (!q) return matchesCategory;
+
+      const matchesName = b.name.toLowerCase().includes(q);
+      const matchesAddress = b.address.toLowerCase().includes(q);
+      const matchesType = b.type.toLowerCase().includes(q);
+      const matchesService = (b.services || []).some((s) =>
+        s.name.toLowerCase().includes(q)
+      );
+
+      return matchesCategory && (matchesName || matchesAddress || matchesType || matchesService);
+    });
+  }, [providerList, selectedCategory, searchQuery]);
+
+  const handleBookBusiness = (business) => {
+    setProvider(business);
+    setServiceType(business.type);
+    router.push("/slots");
+  };
+
+  const getCategoryIcon = (type) => {
+    switch (type) {
+      case "hospital":
+        return "local_hospital";
+      case "salon":
+        return "content_cut";
+      case "dental":
+        return "dentistry";
+      case "aadhaar":
+        return "badge";
+      case "bank":
+        return "account_balance";
+      case "legal":
+        return "gavel";
+      default:
+        return "storefront";
     }
-  }, [isHydrated, bookings, router]);
+  };
 
-  const handleGetStarted = () => {
-    setIsNavigating(true);
-    setTimeout(() => {
-      router.push("/language");
-    }, 400); // Small delay for visual feedback
+  const getCategoryColor = (type) => {
+    switch (type) {
+      case "hospital":
+        return "bg-blue-50 text-blue-700 border-blue-200/60";
+      case "salon":
+        return "bg-pink-50 text-pink-700 border-pink-200/60";
+      case "dental":
+        return "bg-cyan-50 text-cyan-700 border-cyan-200/60";
+      case "aadhaar":
+        return "bg-emerald-50 text-emerald-700 border-emerald-200/60";
+      case "bank":
+        return "bg-amber-50 text-amber-700 border-amber-200/60";
+      case "legal":
+        return "bg-purple-50 text-purple-700 border-purple-200/60";
+      default:
+        return "bg-slate-50 text-slate-700 border-slate-200/60";
+    }
   };
 
   if (!isHydrated) {
@@ -38,131 +108,322 @@ export default function Home() {
     );
   }
 
-  return (
-    <Screen className="flex flex-col min-h-screen bg-background relative overflow-hidden p-0 max-w-container-max mx-auto">
-      {/* Animated Background Ornament */}
-      <div className="absolute top-0 right-0 -translate-y-1/4 translate-x-1/4 w-80 h-80 bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute bottom-0 left-0 translate-y-1/4 -translate-x-1/4 w-64 h-64 bg-secondary/5 rounded-full blur-[80px] pointer-events-none"></div>
+  const currentLangObj =
+    languages.find((l) => l.code === (language || "en")) || languages[0];
 
-      {/* Top Header Bar */}
-      <header className="flex items-center justify-between px-page-margin w-full h-16 bg-surface z-20 shrink-0">
-        <div className="font-headline-md text-headline-md font-bold text-primary">
-          {s.brandName}
-        </div>
+  return (
+    <Screen className="flex flex-col min-h-screen bg-slate-50 relative pb-28">
+      {/* Top App Header */}
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 h-16 flex items-center justify-between max-w-container-max mx-auto w-full">
         <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
+            <span className="material-symbols-outlined text-xl">schedule</span>
+          </div>
+          <div>
+            <span className="font-extrabold text-slate-900 tracking-tight text-lg leading-none block">
+              BookUrTime
+            </span>
+            <span className="text-[10px] text-slate-500 font-semibold tracking-wide">
+              SMART QUEUE & SLOTS
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Quick Language Pill */}
+          <button
+            onClick={() => setShowLangModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-full text-xs font-semibold transition cursor-pointer border border-slate-200"
+            title="Switch Language"
+          >
+            <span className="material-symbols-outlined text-sm">translate</span>
+            <span>{currentLangObj.label.split(" ")[0]}</span>
+          </button>
+
+          {/* Business Terminal Link */}
           <button
             onClick={() => router.push("/business")}
-            className="px-3 py-1.5 rounded-full bg-slate-900 text-white hover:bg-slate-800 active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1.5 shadow-sm"
+            className="px-3 py-1.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white active:scale-95 transition-all cursor-pointer font-semibold text-xs flex items-center gap-1 shadow-sm"
             title="Open Business Device Portal"
           >
             <span className="material-symbols-outlined text-sm text-blue-400">devices</span>
-            <span>Business Terminal</span>
-          </button>
-          <button
-            onClick={() => router.push("/language")}
-            className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:opacity-85 active:scale-95 transition-all cursor-pointer focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
-            title="Change language"
-          >
-            <span className="material-symbols-outlined">language</span>
+            <span className="hidden sm:inline">Business Terminal</span>
           </button>
         </div>
       </header>
 
-      {/* Hero Content Section */}
-      <section className="flex-grow flex flex-col items-center justify-center px-page-margin py-stack-lg relative z-10 text-center select-none">
-        {/* isometric Hero Graphic */}
-        <div className="relative w-full aspect-square max-w-[320px] mb-stack-lg group">
-          {/* Decorative shapes */}
-          <div className="absolute -top-4 -right-4 w-16 h-16 bg-secondary-container rounded-2xl rotate-12 animate-pulse opacity-50"></div>
-          <div className="absolute -bottom-6 -left-2 w-24 h-24 bg-primary-fixed-dim rounded-full mix-blend-multiply opacity-30"></div>
-
-          {/* Isometric Calendar/Clock Image */}
-          <div className="w-full h-full rounded-3xl overflow-hidden shadow-2xl relative bg-white">
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary-container opacity-20 z-0"></div>
-            <Image
-              className="w-full h-full object-cover transform scale-110 transition-transform duration-500 group-hover:scale-115"
-              alt="Isometric calendar and clock illustration representing scheduling efficiency"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf1xa4agKEZn3AXBeMNCsF66kQmP0sI5gnVnNkTs8-WQ020ATzR9fxtYFOz4DtqZDyhFhGDwhiCFKOwIl2k7n234O47npbAMr6sN5cGyNrUcHTZ5Jhv9M3uqShOKPeB1lGQG6zrn1w3KpqFDPNXR-mnDb_ufURSq-S_RnwXFU2oCguRiXYPTP9kxPOrmMWm2OlRgkOXKUhaqwB4ZH7u6E-IuvOhwhBO124snIxNkSzhXTmLNPymMDqUIWr3fWcIgUEL0vYxgLI_A"
-              fill
-              sizes="320px"
-              unoptimized
-            />
-            {/* Glassmorphic Overlay Card */}
-            <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/85 backdrop-blur-md rounded-xl border border-white/20 shadow-lg transform translate-y-1 transition-transform duration-300">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white shrink-0">
-                  <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    check_circle
+      <main className="flex-1 max-w-container-max mx-auto w-full px-4 pt-4 flex flex-col gap-5">
+        {/* ACTIVE APPOINTMENT FLOATING CARD */}
+        {activeBooking && activeBooking.status !== "cancelled" && (
+          <div
+            onClick={() => router.push("/confirmation")}
+            className="bg-gradient-to-r from-blue-700 via-indigo-700 to-blue-800 rounded-2xl p-4 text-white shadow-lg shadow-blue-700/20 cursor-pointer hover:opacity-95 transition flex items-center justify-between select-none animate-fade-in"
+          >
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex flex-col items-center justify-center border border-white/20 shrink-0">
+                <span className="text-[10px] uppercase font-bold text-blue-200 tracking-widest leading-none">
+                  TOKEN
+                </span>
+                <span className="font-mono font-extrabold text-base leading-tight mt-0.5">
+                  {activeBooking.token}
+                </span>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs bg-emerald-400/20 text-emerald-300 font-bold px-2 py-0.5 rounded-md border border-emerald-400/30 uppercase tracking-wider text-[10px]">
+                    ● {activeBooking.status || "Active"}
+                  </span>
+                  <span className="text-xs text-blue-200 font-medium">
+                    Slot: {activeBooking.slot}
                   </span>
                 </div>
-                <div className="text-left">
-                  <p className="font-label-sm text-label-sm text-on-surface-variant">{s.confirmed}</p>
-                  <p className="font-label-lg text-label-lg text-on-surface font-semibold">{s.sampleAppointment}</p>
-                </div>
+                <h4 className="font-bold text-sm text-white mt-1 leading-tight line-clamp-1">
+                  {activeBooking.providerName}
+                </h4>
+                <p className="text-[11px] text-blue-200 mt-0.5 line-clamp-1">
+                  {activeBooking.serviceName || "Scheduled Service"}
+                </p>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Text Details */}
-        <div className="space-y-stack-sm max-w-[320px]">
-          <h1 className="font-display-sm text-display-sm text-on-surface tracking-tight leading-tight">
-            {s.welcomeTitle1}<br />
-            <span className="text-primary font-bold">{s.welcomeTitle2}</span>
-          </h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            {s.welcomeDesc}
-          </p>
-        </div>
-      </section>
-
-      {/* Footer sticky area */}
-      <footer className="p-page-margin bg-surface z-20 shrink-0">
-        <div className="space-y-6">
-          {/* Features summary */}
-          <div className="grid grid-cols-3 gap-2 py-4 border-t border-outline-variant">
-            <div className="flex flex-col items-center gap-1">
-              <span className="material-symbols-outlined text-primary text-2xl">bolt</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureFast}</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <span className="material-symbols-outlined text-primary text-2xl">verified</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureReliable}</span>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <span className="material-symbols-outlined text-primary text-2xl">security</span>
-              <span className="font-label-sm text-label-sm text-on-surface-variant">{s.featureSecure}</span>
+            <div className="flex items-center gap-1 text-xs font-semibold text-white bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl shrink-0 ml-2 transition">
+              <span>View Ticket</span>
+              <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
             </div>
           </div>
+        )}
 
-          {/* Action buttons */}
-          <div className="space-y-2">
-            <button
-              onClick={handleGetStarted}
-              disabled={isNavigating}
-              className="w-full h-[52px] bg-primary text-white rounded-xl font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:opacity-95 active:scale-95 transition-all duration-200 cursor-pointer relative overflow-hidden group"
-            >
-              <div className="absolute inset-0 animate-shine pointer-events-none"></div>
-              {isNavigating ? (
-                <span className="material-symbols-outlined animate-spin">progress_activity</span>
-              ) : (
-                <>
-                  <span>{s.getStarted}</span>
-                  <span className="material-symbols-outlined group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 transition-transform">
-                    arrow_forward
-                  </span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={() => router.push("/bookings")}
-              className="w-full py-3 text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors cursor-pointer"
-            >
-              {s.alreadyHaveAppointment}
-            </button>
+        {/* HERO SEARCH & DISCOVERY BAR */}
+        <section className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col gap-4">
+          <div>
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight leading-tight">
+              Book Your Slot. Skip The Wait.
+            </h1>
+            <p className="text-slate-500 text-xs mt-1">
+              Search any business, reserve your procedure, and track your live queue.
+            </p>
+          </div>
+
+          {/* Search Input Box */}
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xl pointer-events-none">
+              search
+            </span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search clinic, salon, dentist, bank, or service..."
+              className="w-full h-13 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 rounded-xl pl-11 pr-10 text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            )}
+          </div>
+
+          {/* Categories Pill Carousel */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none select-none">
+            {serviceCategories.map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(cat.id)}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 transition cursor-pointer shrink-0 ${
+                    isSelected
+                      ? "bg-blue-600 text-white shadow-sm shadow-blue-600/30 scale-95"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200/70 border border-slate-200/60"
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-sm">{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* BUSINESS DIRECTORY SECTION */}
+        <section className="flex flex-col gap-3">
+          <div className="flex items-center justify-between px-1">
+            <h2 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
+              <span>Available Businesses</span>
+              <span className="text-xs font-semibold bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full">
+                {filteredBusinesses.length}
+              </span>
+            </h2>
+            <span className="text-xs text-slate-500 font-medium">{formatDate()}</span>
+          </div>
+
+          {filteredBusinesses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredBusinesses.map((b) => {
+                const icon = getCategoryIcon(b.type);
+                const badgeColor = getCategoryColor(b.type);
+                const servicesList = b.services || [];
+
+                return (
+                  <div
+                    key={b.id}
+                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-blue-400/80 transition-all flex flex-col justify-between group"
+                  >
+                    <div>
+                      {/* Card Header: Icon + Name + Wait Badge */}
+                      <div className="flex items-start justify-between gap-3 mb-2.5">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}
+                          >
+                            <span className="material-symbols-outlined text-2xl">{icon}</span>
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-base text-slate-900 group-hover:text-blue-600 transition-colors leading-tight line-clamp-1">
+                              {b.name}
+                            </h3>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-500 mt-1">
+                              <span className="capitalize font-semibold text-slate-600">
+                                {b.type}
+                              </span>
+                              <span>•</span>
+                              <span>{b.distanceKm} km away</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-emerald-50 text-emerald-700 border border-emerald-200/70 px-2.5 py-1 rounded-full text-xs font-bold whitespace-nowrap shrink-0">
+                          ~{b.waitMinutes || 12}m wait
+                        </div>
+                      </div>
+
+                      {/* Address Link */}
+                      <p className="text-xs text-slate-500 line-clamp-1 mt-1 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm text-slate-400 shrink-0">
+                          location_on
+                        </span>
+                        <span>{b.address}</span>
+                      </p>
+
+                      {/* Services Preview Tags */}
+                      {servicesList.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {servicesList.map((svc) => (
+                            <span
+                              key={svc.id}
+                              className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200/70"
+                            >
+                              {svc.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Card Footer: Book Button */}
+                    <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+                      <div className="text-xs text-slate-500">
+                        <span className="font-semibold text-slate-700">Taking bookings</span>
+                        <div className="text-[11px] text-slate-400">
+                          Slots: {(b.slots || []).length} daily
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleBookBusiness(b)}
+                        className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/20 active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        <span>Book Slot</span>
+                        <span className="material-symbols-outlined text-sm rtl:rotate-180">
+                          arrow_forward
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-2xl p-10 text-center text-slate-500">
+              <span className="material-symbols-outlined text-4xl text-slate-300 mb-2">
+                search_off
+              </span>
+              <p className="font-bold text-base text-slate-700">No businesses match your search</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Try selecting &quot;All Businesses&quot; or clear your keyword search.
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCategory("all");
+                  setSearchQuery("");
+                }}
+                className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
+        </section>
+      </main>
+
+      {/* LANGUAGE SELECTION MODAL */}
+      {showLangModal && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-blue-600">translate</span>
+                <h3 className="font-bold text-slate-900 text-base">Select Your Language</h3>
+              </div>
+              <button
+                onClick={() => setShowLangModal(false)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="space-y-2 mt-4">
+              {languages.map((l) => {
+                const isSelected = (language || "en") === l.code;
+                return (
+                  <button
+                    key={l.code}
+                    onClick={() => {
+                      setLanguage(l.code);
+                      setShowLangModal(false);
+                    }}
+                    className={`w-full p-3 rounded-xl border text-left transition flex items-center justify-between cursor-pointer ${
+                      isSelected
+                        ? "bg-blue-50 border-blue-500 text-blue-900 shadow-sm"
+                        : "bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-sm text-slate-700 shadow-2xs">
+                        {l.avatar}
+                      </span>
+                      <div>
+                        <div className="font-bold text-sm">{l.label}</div>
+                        <div className="text-[11px] text-slate-500">{l.subtitle}</div>
+                      </div>
+                    </div>
+                    {isSelected && (
+                      <span className="material-symbols-outlined text-blue-600">check_circle</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </footer>
+      )}
+
+      {/* Bottom Nav Bar */}
+      <BottomNavBar />
     </Screen>
   );
 }

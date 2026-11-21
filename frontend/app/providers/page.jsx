@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { providers } from "../../lib/dummyData";
@@ -16,16 +16,9 @@ export default function ProvidersPage() {
   const s = strings[activeLang];
   const [filter, setFilter] = useState("nearest"); // 'nearest' or 'shortest'
 
-  // Guard: redirect to /service if serviceType is missing AFTER hydration
-  useEffect(() => {
-    if (isHydrated && !serviceType) {
-      router.replace("/service");
-    }
-  }, [isHydrated, serviceType, router]);
-
   // Back navigation
   const handleBack = () => {
-    router.push("/service");
+    router.push("/");
   };
 
   // Use dynamic providerList from context (fallback to static providers import if empty)

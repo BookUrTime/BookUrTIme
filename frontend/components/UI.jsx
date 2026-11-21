@@ -24,19 +24,19 @@ export function BottomNavBar() {
   const s = strings[activeLang];
   
   const tabs = [
-    { key: "home", name: s.navHome, icon: "home", href: "/service" },
-    { key: "bookings", name: s.navBookings, icon: "event_note", href: "/bookings" },
+    { key: "home", name: s.navHome || "Explore", icon: "explore", href: "/" },
+    { key: "bookings", name: s.navBookings || "My Bookings", icon: "event_note", href: "/bookings" },
     { key: "business", name: "Business App", icon: "devices", href: "/business" },
-    { key: "support", name: s.navSupport, icon: "support_agent", href: "https://wa.me/919876543210" },
+    { key: "support", name: s.navSupport || "Support", icon: "support_agent", href: "https://wa.me/919876543210" },
   ];
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto h-[72px] flex justify-around items-center px-2 bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-2xl z-50 border-t border-outline-variant/30 select-none">
+    <nav className="fixed bottom-0 left-0 right-0 w-full max-w-container-max mx-auto h-[72px] flex justify-around items-center px-2 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.06)] rounded-t-2xl z-50 border-t border-slate-200 select-none">
       {tabs.map((tab) => {
         const isActive =
           pathname === tab.href ||
           (tab.key === "home" &&
-            (pathname === "/service" || pathname === "/providers" || pathname === "/slots"));
+            (pathname === "/" || pathname === "/slots" || pathname === "/providers" || pathname === "/service"));
 
         return (
           <Link

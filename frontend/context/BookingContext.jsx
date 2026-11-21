@@ -73,7 +73,7 @@ export function BookingProvider({ children }) {
       setIsProviderAccount(true);
       if (router) router.push("/business");
     } else {
-      if (router) router.push("/service");
+      if (router) router.push("/");
     }
   };
 

@@ -31,7 +31,7 @@ export default function LanguagePage() {
     // Add brief delay to show click state feedback (150ms)
     setTimeout(() => {
       setLanguage(langCode);
-      router.push("/service");
+      router.push("/");
     }, 200);
   };
 
